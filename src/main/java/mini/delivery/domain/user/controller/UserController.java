@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mini.delivery.domain.user.dto.NicknameRequestDto;
 import mini.delivery.domain.user.dto.NicknameResponseDto;
+import mini.delivery.domain.user.dto.UserResponseDto;
 import mini.delivery.domain.user.service.UserService;
 import mini.delivery.global.auth.UserDetailsImpl;
 import mini.delivery.global.common.dto.CommonResponseBody;
@@ -37,5 +38,14 @@ public class UserController {
         userService.deleteUser(userDetails.getUsername());
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<CommonResponseBody<UserResponseDto>> getMyProfile(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        UserResponseDto userResponseDto = userService.getMyProfile(userDetails.getUsername());
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommonResponseBody.success("프로필 조회를 성공하였습니다.", userResponseDto));
     }
 }

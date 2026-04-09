@@ -2,6 +2,7 @@ package mini.delivery.domain.user.service;
 
 import lombok.RequiredArgsConstructor;
 import mini.delivery.domain.user.dto.NicknameResponseDto;
+import mini.delivery.domain.user.dto.UserResponseDto;
 import mini.delivery.domain.user.entity.User;
 import mini.delivery.domain.user.repository.UserRepository;
 import mini.delivery.global.error.CustomException;
@@ -29,5 +30,13 @@ public class UserService {
         User user = userRepository.findByEmailAndIsDeletedFalse(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         user.delete();
+    }
+
+    @Transactional(readOnly = true)
+    public UserResponseDto getMyProfile(String email) {
+        User user = userRepository.findByEmailAndIsDeletedFalse(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        return UserResponseDto.from(user);
     }
 }

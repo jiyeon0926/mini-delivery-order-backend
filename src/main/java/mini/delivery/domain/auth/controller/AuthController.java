@@ -32,4 +32,17 @@ public class AuthController {
                 .status(HttpStatus.CREATED)
                 .body(CommonResponseBody.success("회원가입을 성공했습니다.", signupResponseDto));
     }
+
+    @PostMapping("/owners")
+    public ResponseEntity<CommonResponseBody<SignupResponseDto>> signupOwner(@Valid @RequestBody SignupRequestDto signupRequestDto) {
+        SignupResponseDto signupResponseDto = authService.signupOwner(
+                signupRequestDto.getEmail(),
+                signupRequestDto.getPassword(),
+                signupRequestDto.getNickname()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(CommonResponseBody.success("회원가입을 성공했습니다.", signupResponseDto));
+    }
 }

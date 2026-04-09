@@ -2,6 +2,8 @@ package mini.delivery.domain.auth.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import mini.delivery.domain.auth.dto.AuthTokenResponseDto;
+import mini.delivery.domain.auth.dto.LoginRequestDto;
 import mini.delivery.domain.auth.dto.SignupRequestDto;
 import mini.delivery.domain.auth.dto.SignupResponseDto;
 import mini.delivery.domain.auth.service.AuthService;
@@ -44,5 +46,17 @@ public class AuthController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(CommonResponseBody.success("회원가입을 성공했습니다.", signupResponseDto));
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<CommonResponseBody<AuthTokenResponseDto>> login(@RequestBody LoginRequestDto loginRequestDto) {
+        AuthTokenResponseDto authTokenResponseDto = authService.login(
+                loginRequestDto.getEmail(),
+                loginRequestDto.getPassword()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommonResponseBody.success("로그인을 성공했습니다.", authTokenResponseDto));
     }
 }

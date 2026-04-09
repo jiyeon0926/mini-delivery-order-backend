@@ -71,6 +71,10 @@ public class User extends BaseEntity {
         this.nickname = nickname;
     }
 
+    public void updatePassword(String newPassword) {
+        this.password = newPassword;
+    }
+
     public void delete() {
         this.isDeleted = true;
     }

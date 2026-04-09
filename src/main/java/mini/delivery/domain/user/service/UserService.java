@@ -23,4 +23,11 @@ public class UserService {
 
         return NicknameResponseDto.from(user);
     }
+
+    @Transactional
+    public void deleteUser(String email) {
+        User user = userRepository.findByEmailAndIsDeletedFalse(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        user.delete();
+    }
 }

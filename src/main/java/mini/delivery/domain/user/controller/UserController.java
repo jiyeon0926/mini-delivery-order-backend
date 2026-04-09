@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mini.delivery.domain.user.dto.NicknameRequestDto;
 import mini.delivery.domain.user.dto.NicknameResponseDto;
+import mini.delivery.domain.user.dto.PasswordRequestDto;
 import mini.delivery.domain.user.dto.UserResponseDto;
 import mini.delivery.domain.user.service.UserService;
 import mini.delivery.global.auth.UserDetailsImpl;
@@ -31,6 +32,20 @@ public class UserController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(CommonResponseBody.success("닉네임을 변경하였습니다.", nicknameResponseDto));
+    }
+
+    @PatchMapping("/password")
+    public ResponseEntity<CommonResponseBody<Void>> updatePassword(@Valid @RequestBody PasswordRequestDto passwordRequestDto,
+                                                                   @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        userService.updatePassword(
+                passwordRequestDto.getOldPassword(),
+                passwordRequestDto.getNewPassword(),
+                userDetails.getUsername()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommonResponseBody.success("비밀번호를 변경하였습니다."));
     }
 
     @DeleteMapping

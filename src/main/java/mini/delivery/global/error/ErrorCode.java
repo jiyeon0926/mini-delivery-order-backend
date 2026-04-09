@@ -3,11 +3,13 @@ package mini.delivery.global.error;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
-import static org.springframework.http.HttpStatus.CONFLICT;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.*;
 
 @Getter
 public enum ErrorCode {
+
+    // 400 BAD_REQUEST
+    PASSWORD_NOT_MATCH(BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
 
     // 404 NOT_FOUND
     USER_NOT_FOUND(NOT_FOUND, "사용자를 찾을 수 없습니다."),

@@ -94,9 +94,10 @@ CREATE TABLE IF NOT EXISTS `order_items` (
 CREATE TABLE IF NOT EXISTS `reviews` (
 	`id`	BIGINT	NOT NULL	AUTO_INCREMENT	PRIMARY KEY,
 	`user_id`	BIGINT	NOT NULL,
-	`order_id`	BIGINT	NOT NULL,
+	`order_id`	BIGINT	NOT NULL UNIQUE,
 	`rating`	INT	NOT NULL	DEFAULT 1,
 	`content`	TEXT	NOT NULL,
+	`is_deleted`	BOOLEAN	NOT NULL	DEFAULT false,
 	`created_at`	DATETIME	NOT NULL,
 	`updated_at`	DATETIME	NOT NULL,
 

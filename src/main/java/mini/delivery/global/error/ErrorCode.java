@@ -13,6 +13,7 @@ public enum ErrorCode {
 
     // 404 NOT_FOUND
     USER_NOT_FOUND(NOT_FOUND, "사용자를 찾을 수 없습니다."),
+    STORE_NOT_FOUND(NOT_FOUND, "가게를 찾을 수 없습니다."),
 
     // 409 CONFLICT
     EMAIL_ALREADY_EXISTS(CONFLICT, "이미 사용 중인 이메일입니다."),

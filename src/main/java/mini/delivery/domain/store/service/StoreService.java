@@ -3,6 +3,7 @@ package mini.delivery.domain.store.service;
 import lombok.RequiredArgsConstructor;
 import mini.delivery.domain.store.dto.StoreCreateRequestDto;
 import mini.delivery.domain.store.dto.StoreCreateResponseDto;
+import mini.delivery.domain.store.dto.StoreUpdateRequestDto;
 import mini.delivery.domain.store.entity.Store;
 import mini.delivery.domain.store.repository.StoreRepository;
 import mini.delivery.domain.user.entity.User;
@@ -36,6 +37,21 @@ public class StoreService {
         Store savedStore = storeRepository.save(store);
 
         return StoreCreateResponseDto.from(savedStore);
+    }
+
+    /**
+     * TODO 가게 수정
+     * 현재 가게 이름과 주소만 수정 가능
+     */
+    @Transactional
+    public void updateStore(Long storeId, StoreUpdateRequestDto storeUpdateRequestDto, String email) {
+        User user = userRepository.findByEmailAndIsDeletedFalse(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        Store store = storeRepository.findByIdAndUserId(storeId, user.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
+
+        store.updateName(storeUpdateRequestDto.getName());
+        store.updateAddress(storeUpdateRequestDto.getAddress());
     }
 
     private void validateStoreLimit(Long userId) {

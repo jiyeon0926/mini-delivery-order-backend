@@ -23,6 +23,7 @@ public class StoreService {
     public StoreCreateResponseDto createStore(StoreCreateRequestDto storeCreateRequestDto, String email) {
         User user = userRepository.findByEmailAndIsDeletedFalse(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        validateStoreLimit(user.getId());
 
         Store store = Store.create(
                 user,
@@ -35,5 +36,12 @@ public class StoreService {
         Store savedStore = storeRepository.save(store);
 
         return StoreCreateResponseDto.from(savedStore);
+    }
+
+    private void validateStoreLimit(Long userId) {
+        long storeCount = storeRepository.countByUserId(userId);
+        if (storeCount >= 3) {
+            throw new CustomException(ErrorCode.STORE_LIMIT_EXCEEDED);
+        }
     }
 }

@@ -3,6 +3,7 @@ package mini.delivery.global.config;
 import jakarta.servlet.DispatcherType;
 import lombok.RequiredArgsConstructor;
 import mini.delivery.global.auth.jwt.JwtAuthFilter;
+import mini.delivery.global.common.enums.Role;
 import org.springframework.boot.security.autoconfigure.web.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,6 +45,8 @@ public class SecurityConfig {
                         auth.requestMatchers(WHITE_LIST).permitAll()
                                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                                 .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.INCLUDE, DispatcherType.ERROR).permitAll()
+                                .requestMatchers("/api/owner/**").hasRole(Role.OWNER.name())
+                                .requestMatchers("/api/cart/**", "/api/orders/**").hasRole(Role.CUSTOMER.name())
                                 .anyRequest().authenticated())
                 .userDetailsService(userDetailsService)
                 .exceptionHandling(handler -> handler

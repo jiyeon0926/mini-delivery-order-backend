@@ -23,4 +23,13 @@ public class AuthService {
 
         return SignupResponseDto.from(savedUser);
     }
+
+    @Transactional
+    public SignupResponseDto signupOwner(String email, String password, String nickname) {
+        String encodedPassword = passwordEncoder.encode(password);
+        User user = User.ofOwner(email, encodedPassword, nickname);
+        User savedUser = userRepository.save(user);
+
+        return SignupResponseDto.from(savedUser);
+    }
 }

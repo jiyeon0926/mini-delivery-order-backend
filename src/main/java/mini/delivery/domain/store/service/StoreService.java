@@ -72,6 +72,13 @@ public class StoreService {
         return StoreResponseDto.from(store, averageRating, reviewCount, StoreMenuResponseDto.from(menus));
     }
 
+    @Transactional(readOnly = true)
+    public List<StoreSummaryResponseDto> searchStores(String keyword) {
+        List<StoreSummaryDto> stores = storeRepository.searchStores(keyword);
+
+        return StoreSummaryResponseDto.from(stores);
+    }
+
     private void validateStoreLimit(Long userId) {
         long storeCount = storeRepository.countByUserId(userId);
         if (storeCount >= 3) {

@@ -5,12 +5,13 @@ import mini.delivery.domain.store.entity.Store;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 @Getter
 public class StoreResponseDto {
 
     private final Long id;
-    private final String name;
+    private final String storeName;
     private final String address;
     private final int minOrderAmount;
     private final LocalTime openTime;
@@ -19,10 +20,11 @@ public class StoreResponseDto {
     private final float averageRating;
     private final long reviewCount;
     private final LocalDateTime createdAt;
+    private final List<StoreMenuResponseDto> menus;
 
-    private StoreResponseDto(Long id, String name, String address, int minOrderAmount, LocalTime openTime, LocalTime closeTime, String storeStatus, float averageRating, long reviewCount, LocalDateTime createdAt) {
+    private StoreResponseDto(Long id, String storeName, String address, int minOrderAmount, LocalTime openTime, LocalTime closeTime, String storeStatus, float averageRating, long reviewCount, LocalDateTime createdAt, List<StoreMenuResponseDto> menus) {
         this.id = id;
-        this.name = name;
+        this.storeName = storeName;
         this.address = address;
         this.minOrderAmount = minOrderAmount;
         this.openTime = openTime;
@@ -31,9 +33,10 @@ public class StoreResponseDto {
         this.averageRating = averageRating;
         this.reviewCount = reviewCount;
         this.createdAt = createdAt;
+        this.menus = menus;
     }
 
-    public static StoreResponseDto from(Store store, float averageRating, long reviewCount) {
+    public static StoreResponseDto from(Store store, float averageRating, long reviewCount, List<StoreMenuResponseDto> menus) {
         return new StoreResponseDto(
                 store.getId(),
                 store.getName(),
@@ -44,7 +47,8 @@ public class StoreResponseDto {
                 store.getStoreStatus().name(),
                 averageRating,
                 reviewCount,
-                store.getCreatedAt()
+                store.getCreatedAt(),
+                menus
         );
     }
 }

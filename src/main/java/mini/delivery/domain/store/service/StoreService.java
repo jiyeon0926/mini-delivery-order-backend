@@ -1,11 +1,10 @@
 package mini.delivery.domain.store.service;
 
 import lombok.RequiredArgsConstructor;
+import mini.delivery.domain.menu.entity.Menu;
+import mini.delivery.domain.menu.repository.MenuRepository;
 import mini.delivery.domain.review.repository.ReviewRepository;
-import mini.delivery.domain.store.dto.StoreCreateRequestDto;
-import mini.delivery.domain.store.dto.StoreCreateResponseDto;
-import mini.delivery.domain.store.dto.StoreResponseDto;
-import mini.delivery.domain.store.dto.StoreUpdateRequestDto;
+import mini.delivery.domain.store.dto.*;
 import mini.delivery.domain.store.entity.Store;
 import mini.delivery.domain.store.repository.StoreRepository;
 import mini.delivery.domain.user.entity.User;
@@ -15,6 +14,8 @@ import mini.delivery.global.error.ErrorCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class StoreService {
@@ -22,6 +23,7 @@ public class StoreService {
     private final StoreRepository storeRepository;
     private final UserRepository userRepository;
     private final ReviewRepository reviewRepository;
+    private final MenuRepository menuRepository;
 
     @Transactional
     public StoreCreateResponseDto createStore(StoreCreateRequestDto storeCreateRequestDto, String email) {
@@ -61,10 +63,13 @@ public class StoreService {
     public StoreResponseDto getStoreById(Long storeId) {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
+
         float averageRating = reviewRepository.averageRatingByStoreId(storeId);
         long reviewCount = reviewRepository.countByStoreId(storeId);
 
-        return StoreResponseDto.from(store, averageRating, reviewCount);
+        List<Menu> menus = menuRepository.findAllByStoreId(storeId);
+
+        return StoreResponseDto.from(store, averageRating, reviewCount, StoreMenuResponseDto.from(menus));
     }
 
     private void validateStoreLimit(Long userId) {

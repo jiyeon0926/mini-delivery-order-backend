@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mini.delivery.domain.store.dto.StoreCreateRequestDto;
 import mini.delivery.domain.store.dto.StoreCreateResponseDto;
+import mini.delivery.domain.store.dto.StoreResponseDto;
 import mini.delivery.domain.store.dto.StoreUpdateRequestDto;
 import mini.delivery.domain.store.service.StoreService;
 import mini.delivery.global.auth.UserDetailsImpl;
@@ -46,5 +47,14 @@ public class StoreController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(CommonResponseBody.success("가게를 수정하였습니다."));
+    }
+
+    @GetMapping("/stores/{storeId}")
+    public ResponseEntity<CommonResponseBody<StoreResponseDto>> getStoreById(@PathVariable Long storeId) {
+        StoreResponseDto storeResponseDto = storeService.getStoreById(storeId);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommonResponseBody.success("가게 조회를 성공하였습니다.", storeResponseDto));
     }
 }

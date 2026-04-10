@@ -17,12 +17,12 @@ public class StoreResponseDto {
     private final LocalTime openTime;
     private final LocalTime closeTime;
     private final String storeStatus;
-    private final float averageRating;
+    private final double averageRating;
     private final long reviewCount;
     private final LocalDateTime createdAt;
     private final List<StoreMenuResponseDto> menus;
 
-    private StoreResponseDto(Long id, String storeName, String address, int minOrderAmount, LocalTime openTime, LocalTime closeTime, String storeStatus, float averageRating, long reviewCount, LocalDateTime createdAt, List<StoreMenuResponseDto> menus) {
+    private StoreResponseDto(Long id, String storeName, String address, int minOrderAmount, LocalTime openTime, LocalTime closeTime, String storeStatus, double averageRating, long reviewCount, LocalDateTime createdAt, List<StoreMenuResponseDto> menus) {
         this.id = id;
         this.storeName = storeName;
         this.address = address;
@@ -36,7 +36,7 @@ public class StoreResponseDto {
         this.menus = menus;
     }
 
-    public static StoreResponseDto from(Store store, float averageRating, long reviewCount, List<StoreMenuResponseDto> menus) {
+    public static StoreResponseDto from(Store store, double averageRating, long reviewCount, List<StoreMenuResponseDto> menus) {
         return new StoreResponseDto(
                 store.getId(),
                 store.getName(),

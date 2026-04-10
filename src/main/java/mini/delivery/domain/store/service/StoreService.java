@@ -64,7 +64,7 @@ public class StoreService {
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
 
-        float averageRating = reviewRepository.averageRatingByStoreId(storeId);
+        double averageRating = reviewRepository.averageRatingByStoreId(storeId);
         long reviewCount = reviewRepository.countByStoreId(storeId);
 
         List<Menu> menus = menuRepository.findAllByStoreId(storeId);

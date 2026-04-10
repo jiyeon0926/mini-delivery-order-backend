@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     @Query("SELECT AVG(r.rating) FROM Review r WHERE r.isDeleted = false AND r.order.store.id = :storeId")
-    float averageRatingByStoreId(@Param("storeId") Long storeId);
+    double averageRatingByStoreId(@Param("storeId") Long storeId);
 
     @Query("SELECT COUNT(r.id) FROM Review r WHERE r.isDeleted = false AND r.order.store.id = :storeId")
     long countByStoreId(@Param("storeId") Long storeId);

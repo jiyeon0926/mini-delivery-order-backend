@@ -2,10 +2,7 @@ package mini.delivery.domain.store.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import mini.delivery.domain.store.dto.StoreCreateRequestDto;
-import mini.delivery.domain.store.dto.StoreCreateResponseDto;
-import mini.delivery.domain.store.dto.StoreResponseDto;
-import mini.delivery.domain.store.dto.StoreUpdateRequestDto;
+import mini.delivery.domain.store.dto.*;
 import mini.delivery.domain.store.service.StoreService;
 import mini.delivery.global.auth.UserDetailsImpl;
 import mini.delivery.global.common.dto.CommonResponseBody;
@@ -13,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -56,5 +55,14 @@ public class StoreController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(CommonResponseBody.success("가게 조회를 성공하였습니다.", storeResponseDto));
+    }
+
+    @GetMapping("/stores")
+    public ResponseEntity<CommonResponseBody<List<StoreSummaryResponseDto>>> searchStores(@RequestParam(value = "keyword", required = false) String keyword) {
+        List<StoreSummaryResponseDto> storeSummaryResponseDtoList = storeService.searchStores(keyword);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommonResponseBody.success("가게 목록 조회를 성공하였습니다.", storeSummaryResponseDtoList));
     }
 }

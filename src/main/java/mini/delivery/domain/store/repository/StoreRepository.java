@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface StoreRepository extends JpaRepository<Store, Long> {
+public interface StoreRepository extends JpaRepository<Store, Long>, CustomStoreRepository {
 
     long countByUserId(Long userId);
 

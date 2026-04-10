@@ -26,7 +26,7 @@ public class Cart extends BaseEntity {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "store_id", nullable = false, updatable = false)
+    @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -39,5 +39,9 @@ public class Cart extends BaseEntity {
 
     public static Cart create(User user, Store store) {
         return new Cart(user, store);
+    }
+
+    public void updateCart(Store newStore) {
+        this.store = newStore;
     }
 }

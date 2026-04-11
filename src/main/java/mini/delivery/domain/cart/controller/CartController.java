@@ -9,10 +9,7 @@ import mini.delivery.global.common.dto.CommonResponseBody;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/cart")
@@ -33,5 +30,13 @@ public class CartController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(CommonResponseBody.success("장바구니에 담았습니다."));
+    }
+
+    @DeleteMapping("/items/{itemId}")
+    public ResponseEntity<Void> deleteCartItem(@PathVariable Long itemId,
+                                               @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        cartService.deleteCartItem(itemId, userDetails.getUsername());
+
+        return ResponseEntity.noContent().build();
     }
 }

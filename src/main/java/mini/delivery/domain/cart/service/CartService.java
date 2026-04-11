@@ -47,6 +47,16 @@ public class CartService {
         cartItemRepository.save(cartItem);
     }
 
+    @Transactional
+    public void deleteCartItem(Long itemId, String email) {
+        User user = userRepository.findByEmailAndIsDeletedFalse(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        CartItem cartItem = cartItemRepository.findByIdAndUserId(itemId, user.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.CART_ITEM_NOT_FOUND));
+
+        cartItemRepository.delete(cartItem);
+    }
+
     private void clearCartIfDifferentStore(Cart cart, Store newStore) {
         Long currentStoreId = cart.getStore().getId();
         Long newStoreId = newStore.getId();

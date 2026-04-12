@@ -1,6 +1,8 @@
 package mini.delivery.domain.cart.service;
 
 import lombok.RequiredArgsConstructor;
+import mini.delivery.domain.cart.dto.CartItemResponseDto;
+import mini.delivery.domain.cart.dto.CartResponseDto;
 import mini.delivery.domain.cart.entity.Cart;
 import mini.delivery.domain.cart.entity.CartItem;
 import mini.delivery.domain.cart.repository.CartItemRepository;
@@ -14,6 +16,8 @@ import mini.delivery.global.error.CustomException;
 import mini.delivery.global.error.ErrorCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -57,6 +61,26 @@ public class CartService {
         cartItemRepository.delete(cartItem);
     }
 
+    @Transactional
+    public CartResponseDto updateItemQuantity(Long itemId, int quantity, String email) {
+        User user = userRepository.findByEmailAndIsDeletedFalse(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        CartItem cartItem = cartItemRepository.findByIdAndUserId(itemId, user.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.CART_ITEM_NOT_FOUND));
+
+        cartItem.updateQuantity(quantity);
+
+        return buildCartResponse(user.getId());
+    }
+
+    @Transactional(readOnly = true)
+    public CartResponseDto getMyCart(String email) {
+        User user = userRepository.findByEmailAndIsDeletedFalse(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        return buildCartResponse(user.getId());
+    }
+
     private void clearCartIfDifferentStore(Cart cart, Store newStore) {
         Long currentStoreId = cart.getStore().getId();
         Long newStoreId = newStore.getId();
@@ -72,5 +96,34 @@ public class CartService {
                 .ifPresent(item -> {
                     throw new CustomException(ErrorCode.CART_ITEM_ALREADY_EXISTS);
                 });
+    }
+
+    private CartResponseDto buildCartResponse(Long userId) {
+        Cart cart = cartRepository.findByUserIdWithStore(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CART_NOT_FOUND));
+
+        List<CartItem> items = cartItemRepository.findAllByCartIdWithMenu(cart.getId());
+
+        List<CartItemResponseDto> cartItemResponseDtoList = calculateTotalPrices(items);
+        int totalAmount = calculateTotalAmount(items);
+
+        return CartResponseDto.from(cart, cartItemResponseDtoList, totalAmount);
+    }
+
+    private List<CartItemResponseDto> calculateTotalPrices(List<CartItem> items) {
+        return items.stream()
+                .map(item -> {
+                    Menu menu = item.getMenu();
+                    int totalPrice = menu.getPrice() * item.getQuantity();
+
+                    return CartItemResponseDto.from(item, totalPrice);
+                })
+                .toList();
+    }
+
+    private int calculateTotalAmount(List<CartItem> items) {
+        return items.stream()
+                .mapToInt(item -> item.getMenu().getPrice() * item.getQuantity())
+                .sum();
     }
 }

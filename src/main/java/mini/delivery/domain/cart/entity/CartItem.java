@@ -37,4 +37,8 @@ public class CartItem extends BaseEntity {
     public static CartItem create(Cart cart, Menu menu, int quantity) {
         return new CartItem(cart, menu, quantity);
     }
+
+    public void updateQuantity(int quantity) {
+        this.quantity = quantity;
+    }
 }

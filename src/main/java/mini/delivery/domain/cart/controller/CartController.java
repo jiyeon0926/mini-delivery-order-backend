@@ -56,4 +56,13 @@ public class CartController {
                 .status(HttpStatus.OK)
                 .body(CommonResponseBody.success("수량을 변경하였습니다.", cartResponseDto));
     }
+
+    @GetMapping
+    public ResponseEntity<CommonResponseBody<CartResponseDto>> getMyCart(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        CartResponseDto cartResponseDto = cartService.getMyCart(userDetails.getUsername());
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommonResponseBody.success("장바구니 조회를 성공하였습니다.", cartResponseDto));
+    }
 }

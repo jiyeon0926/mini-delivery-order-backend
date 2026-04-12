@@ -70,13 +70,15 @@ public class CartService {
 
         cartItem.updateQuantity(quantity);
 
-        Cart cart = cartRepository.findByUserIdWithStore(user.getId())
-                .orElseThrow(() -> new CustomException(ErrorCode.CART_NOT_FOUND));
-        List<CartItem> items = cartItemRepository.findAllByCartIdWithMenu(cart.getId());
-        List<CartItemResponseDto> cartItemResponseDtoList = calculateTotalPrices(items);
-        int totalAmount = calculateTotalAmount(items);
+        return buildCartResponse(user.getId());
+    }
 
-        return CartResponseDto.from(cart, cartItemResponseDtoList, totalAmount);
+    @Transactional(readOnly = true)
+    public CartResponseDto getMyCart(String email) {
+        User user = userRepository.findByEmailAndIsDeletedFalse(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        return buildCartResponse(user.getId());
     }
 
     private void clearCartIfDifferentStore(Cart cart, Store newStore) {
@@ -94,6 +96,18 @@ public class CartService {
                 .ifPresent(item -> {
                     throw new CustomException(ErrorCode.CART_ITEM_ALREADY_EXISTS);
                 });
+    }
+
+    private CartResponseDto buildCartResponse(Long userId) {
+        Cart cart = cartRepository.findByUserIdWithStore(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CART_NOT_FOUND));
+
+        List<CartItem> items = cartItemRepository.findAllByCartIdWithMenu(cart.getId());
+
+        List<CartItemResponseDto> cartItemResponseDtoList = calculateTotalPrices(items);
+        int totalAmount = calculateTotalAmount(items);
+
+        return CartResponseDto.from(cart, cartItemResponseDtoList, totalAmount);
     }
 
     private List<CartItemResponseDto> calculateTotalPrices(List<CartItem> items) {

@@ -3,6 +3,8 @@ package mini.delivery.domain.cart.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mini.delivery.domain.cart.dto.CartItemCreateRequestDto;
+import mini.delivery.domain.cart.dto.CartResponseDto;
+import mini.delivery.domain.cart.dto.QuantityUpdateRequestDto;
 import mini.delivery.domain.cart.service.CartService;
 import mini.delivery.global.auth.UserDetailsImpl;
 import mini.delivery.global.common.dto.CommonResponseBody;
@@ -38,5 +40,20 @@ public class CartController {
         cartService.deleteCartItem(itemId, userDetails.getUsername());
 
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/items/{itemId}")
+    public ResponseEntity<CommonResponseBody<CartResponseDto>> updateItemQuantity(@PathVariable Long itemId,
+                                                                                  @Valid @RequestBody QuantityUpdateRequestDto quantityUpdateRequestDto,
+                                                                                  @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        CartResponseDto cartResponseDto = cartService.updateItemQuantity(
+                itemId,
+                quantityUpdateRequestDto.getQuantity(),
+                userDetails.getUsername()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommonResponseBody.success("수량을 변경하였습니다.", cartResponseDto));
     }
 }

@@ -35,7 +35,7 @@ public class StoreController {
 
     @PatchMapping("/owner/stores/{storeId}")
     public ResponseEntity<CommonResponseBody<Void>> updateStore(@PathVariable Long storeId,
-                                                                @RequestBody StoreUpdateRequestDto storeUpdateRequestDto,
+                                                                @Valid @RequestBody StoreUpdateRequestDto storeUpdateRequestDto,
                                                                 @AuthenticationPrincipal UserDetailsImpl userDetails) {
         storeService.updateStore(
                 storeId,

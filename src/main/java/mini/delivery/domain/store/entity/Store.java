@@ -91,4 +91,16 @@ public class Store extends BaseEntity {
     public void updateAddress(String address) {
         this.address = address;
     }
+
+    public void updateMinOrderAmount(int minOrderAmount) {
+        this.minOrderAmount = minOrderAmount;
+    }
+
+    public void updateOpenTime(LocalTime openTime) {
+        this.openTime = openTime;
+    }
+
+    public void updateCloseTime(LocalTime closeTime) {
+        this.closeTime = closeTime;
+    }
 }

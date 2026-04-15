@@ -44,10 +44,6 @@ public class StoreService {
         return StoreCreateResponseDto.from(savedStore);
     }
 
-    /**
-     * TODO 가게 수정
-     * 현재 가게 이름과 주소만 수정 가능
-     */
     @Transactional
     public void updateStore(Long storeId, StoreUpdateRequestDto storeUpdateRequestDto, String email) {
         User user = userRepository.findByEmailAndIsDeletedFalse(email)
@@ -55,8 +51,21 @@ public class StoreService {
         Store store = storeRepository.findByIdAndUserId(storeId, user.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
 
-        store.updateName(storeUpdateRequestDto.getName());
-        store.updateAddress(storeUpdateRequestDto.getAddress());
+        if (storeUpdateRequestDto.getName() != null) {
+            store.updateName(storeUpdateRequestDto.getName());
+        }
+        if (storeUpdateRequestDto.getAddress() != null) {
+            store.updateAddress(storeUpdateRequestDto.getAddress());
+        }
+        if (storeUpdateRequestDto.getMinOrderAmount() != null) {
+            store.updateMinOrderAmount(storeUpdateRequestDto.getMinOrderAmount());
+        }
+        if (storeUpdateRequestDto.getOpenTime() != null) {
+            store.updateOpenTime(storeUpdateRequestDto.getOpenTime());
+        }
+        if (storeUpdateRequestDto.getCloseTime() != null) {
+            store.updateCloseTime(storeUpdateRequestDto.getCloseTime());
+        }
     }
 
     @Transactional(readOnly = true)

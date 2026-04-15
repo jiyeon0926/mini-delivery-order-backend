@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import mini.delivery.domain.review.entity.Review;
 import mini.delivery.domain.store.entity.Store;
 import mini.delivery.domain.user.entity.User;
 import mini.delivery.global.common.entity.BaseEntity;
@@ -52,9 +51,6 @@ public class Order extends BaseEntity {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItemList = new ArrayList<>();
-
-    @OneToOne(mappedBy = "order")
-    private Review review;
 
     @Builder
     private Order(User user, Store store, String address, OrderStatus orderStatus, String rejectionReason, int totalAmount) {

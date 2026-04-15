@@ -84,6 +84,14 @@ public class Store extends BaseEntity {
                 .build();
     }
 
+    public boolean isOpenStatus() {
+        return storeStatus.equals(StoreStatus.OPEN);
+    }
+
+    public boolean isNotOpenStatus() {
+        return !isOpenStatus();
+    }
+
     public void updateName(String name) {
         this.name = name;
     }

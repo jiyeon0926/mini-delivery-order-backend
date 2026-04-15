@@ -41,6 +41,8 @@ public class CartService {
         Menu menu = menuRepository.findByIdWithStore(menuId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MENU_NOT_FOUND));
 
+        validateStoreOpen(menu.getStore());
+
         Cart cart = cartRepository.findByUserId(user.getId())
                 .orElseGet(() -> cartRepository.save(Cart.create(user, menu.getStore())));
 
@@ -79,6 +81,12 @@ public class CartService {
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
         return buildCartResponse(user.getId());
+    }
+
+    private void validateStoreOpen(Store store) {
+        if (store.isNotOpenStatus()) {
+            throw new CustomException(ErrorCode.STORE_NOT_OPEN);
+        }
     }
 
     private void clearCartIfDifferentStore(Cart cart, Store newStore) {

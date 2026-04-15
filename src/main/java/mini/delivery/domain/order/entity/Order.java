@@ -66,12 +66,11 @@ public class Order extends BaseEntity {
         this.totalAmount = totalAmount;
     }
 
-    public static Order create(User user, Store store, String address, String rejectionReason, int totalAmount) {
+    public static Order create(User user, Store store, String address, int totalAmount) {
         return Order.builder()
                 .user(user)
                 .store(store)
                 .address(address)
-                .rejectionReason(rejectionReason)
                 .totalAmount(totalAmount)
                 .orderStatus(OrderStatus.PENDING)
                 .build();

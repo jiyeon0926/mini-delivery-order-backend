@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import mini.delivery.domain.cart.entity.Cart;
 import mini.delivery.domain.order.entity.Order;
 import mini.delivery.domain.review.entity.Review;
 import mini.delivery.domain.store.entity.Store;
@@ -42,9 +41,6 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user")
     private List<Store> storeList = new ArrayList<>();
-
-    @OneToOne(mappedBy = "user")
-    private Cart cart;
 
     @OneToMany(mappedBy = "user")
     private List<Order> orderList = new ArrayList<>();

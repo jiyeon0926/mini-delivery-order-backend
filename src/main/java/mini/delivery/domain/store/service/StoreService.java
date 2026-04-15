@@ -9,6 +9,7 @@ import mini.delivery.domain.store.entity.Store;
 import mini.delivery.domain.store.repository.StoreRepository;
 import mini.delivery.domain.user.entity.User;
 import mini.delivery.domain.user.repository.UserRepository;
+import mini.delivery.global.common.enums.StoreStatus;
 import mini.delivery.global.error.CustomException;
 import mini.delivery.global.error.ErrorCode;
 import org.springframework.stereotype.Service;
@@ -88,10 +89,24 @@ public class StoreService {
         return StoreSummaryResponseDto.from(stores);
     }
 
+    @Transactional
+    public StoreStatusChangeResponseDto storeStatus(Long storeId, String storeStatus, String email) {
+        User user = userRepository.findByEmailAndIsDeletedFalse(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        Store store = storeRepository.findByIdAndUserId(storeId, user.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
+
+        store.updateStoreStatus(StoreStatus.of(storeStatus));
+
+        return new StoreStatusChangeResponseDto(store.getId(), store.getStoreStatus().name());
+    }
+
     private void validateStoreLimit(Long userId) {
         long storeCount = storeRepository.countByUserId(userId);
         if (storeCount >= 3) {
             throw new CustomException(ErrorCode.STORE_LIMIT_EXCEEDED);
         }
     }
+
+
 }

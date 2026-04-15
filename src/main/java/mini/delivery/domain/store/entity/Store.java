@@ -103,4 +103,8 @@ public class Store extends BaseEntity {
     public void updateCloseTime(LocalTime closeTime) {
         this.closeTime = closeTime;
     }
+
+    public void updateStoreStatus(StoreStatus storeStatus){
+        this.storeStatus = storeStatus;
+    }
 }

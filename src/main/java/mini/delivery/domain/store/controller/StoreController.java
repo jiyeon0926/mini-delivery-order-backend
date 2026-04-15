@@ -65,4 +65,20 @@ public class StoreController {
                 .status(HttpStatus.OK)
                 .body(CommonResponseBody.success("가게 목록 조회를 성공하였습니다.", storeSummaryResponseDtoList));
     }
+
+    //가게 영업 상태 변경
+    @PatchMapping("/owner/stores/{storeId}/status")
+    public ResponseEntity<CommonResponseBody<StoreStatusChangeResponseDto>> storeStatus(@PathVariable Long storeId,
+                                                                                        @RequestBody StoreStatusChangeDto storeStatusChangeDto,
+                                                                                        @AuthenticationPrincipal UserDetailsImpl userDetails) { // id 필요할 거 같음)
+        StoreStatusChangeResponseDto storeStatusChangeResponseDto = storeService.storeStatus(
+                storeId,
+                storeStatusChangeDto.getStoreStatus(),
+                userDetails.getUsername()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommonResponseBody.success("가게 상태 변경을 성공하였습니다.", storeStatusChangeResponseDto));
+    }
 }

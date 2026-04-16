@@ -50,4 +50,12 @@ public class Menu extends BaseEntity {
     public static Menu create(Store store, String name, int price) {
         return new Menu(store, name, price);
     }
+
+    public void updateName(String name){
+        this.name = name;
+    }
+
+    public void updatePrice(Integer price){
+        this.price = price;
+    }
 }

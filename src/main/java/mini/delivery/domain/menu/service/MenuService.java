@@ -3,6 +3,7 @@ package mini.delivery.domain.menu.service;
 import lombok.RequiredArgsConstructor;
 import mini.delivery.domain.menu.dto.MenuCreateRequestDto;
 import mini.delivery.domain.menu.dto.MenuCreateResponseDto;
+import mini.delivery.domain.menu.dto.MenuUpdateRequestDto;
 import mini.delivery.domain.menu.entity.Menu;
 import mini.delivery.domain.menu.repository.MenuRepository;
 import mini.delivery.domain.store.entity.Store;
@@ -39,5 +40,32 @@ public class MenuService {
         Menu savedMenu = menuRepository.save(menu);
 
         return MenuCreateResponseDto.from(savedMenu);
+    }
+
+    @Transactional
+    public void updateMenu(Long storeId, Long menuId, MenuUpdateRequestDto menuUpdateRequestDto, String email) {
+        // email로 user 조회
+        User user = userRepository.findByEmailAndIsDeletedFalse(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        // 내 가게 인지(사장 권한) 확인
+        storeRepository.findByIdAndUserId(storeId, user.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
+
+        // 메뉴 조회 (stroe까지 같이 가져오기)
+        Menu menu = menuRepository.findByIdWithStore(menuId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MENU_NOT_FOUND));
+
+        // 이 메뉴가 해당 storeId의 소속인지 확인
+        if(!menu.getStore().getId().equals(storeId)) {
+            throw new CustomException(ErrorCode.MENU_NOT_FOUND);
+        }
+        
+        if (menuUpdateRequestDto.getName() != null) {
+            menu.updateName(menuUpdateRequestDto.getName());
+        }
+        if (menuUpdateRequestDto.getPrice() != null) {
+            menu.updatePrice(menuUpdateRequestDto.getPrice());
+        }
     }
 }

@@ -19,7 +19,7 @@ import java.util.List;
 public class StoreController {
 
     private final StoreService storeService;
-
+    // 가게 생성
     @PostMapping("/owner/stores")
     public ResponseEntity<CommonResponseBody<StoreCreateResponseDto>> createStore(@Valid @RequestBody StoreCreateRequestDto storeCreateRequestDto,
                                                                                   @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -70,7 +70,7 @@ public class StoreController {
     @PatchMapping("/owner/stores/{storeId}/status")
     public ResponseEntity<CommonResponseBody<StoreStatusChangeResponseDto>> storeStatus(@PathVariable Long storeId,
                                                                                         @RequestBody StoreStatusChangeDto storeStatusChangeDto,
-                                                                                        @AuthenticationPrincipal UserDetailsImpl userDetails) { // id 필요할 거 같음)
+                                                                                        @AuthenticationPrincipal UserDetailsImpl userDetails) {
         StoreStatusChangeResponseDto storeStatusChangeResponseDto = storeService.storeStatus(
                 storeId,
                 storeStatusChangeDto.getStoreStatus(),
@@ -80,5 +80,17 @@ public class StoreController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(CommonResponseBody.success("가게 상태 변경을 성공하였습니다.", storeStatusChangeResponseDto));
+    }
+
+    //가게 폐업
+    @DeleteMapping("/owner/stores/{storeId}")
+    public ResponseEntity<Void> closeStore(@PathVariable Long storeId,
+                                           @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        storeService.closeStore(
+                storeId,
+                userDetails.getUsername()
+        );
+
+        return ResponseEntity.noContent().build();
     }
 }

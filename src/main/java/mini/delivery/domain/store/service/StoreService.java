@@ -101,6 +101,16 @@ public class StoreService {
         return new StoreStatusChangeResponseDto(store.getId(), store.getStoreStatus().name());
     }
 
+    @Transactional
+    public void closeStore(Long storeId, String email){
+        User user = userRepository.findByEmailAndIsDeletedFalse(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        Store store = storeRepository.findByIdAndUserId(storeId, user.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
+
+        store.deleteStore();
+    }
+
     private void validateStoreLimit(Long userId) {
         long storeCount = storeRepository.countByUserId(userId);
         if (storeCount >= 3) {

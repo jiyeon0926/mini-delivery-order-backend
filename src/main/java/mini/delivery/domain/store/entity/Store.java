@@ -115,4 +115,8 @@ public class Store extends BaseEntity {
     public void updateStoreStatus(StoreStatus storeStatus){
         this.storeStatus = storeStatus;
     }
+
+    public void deleteStore(){
+        this.isDeleted=true;
+    }
 }

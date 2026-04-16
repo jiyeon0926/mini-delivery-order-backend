@@ -32,7 +32,7 @@ public class StoreController {
                 .status(HttpStatus.CREATED)
                 .body(CommonResponseBody.success("가게를 생성하였습니다.", storeCreateResponseDto));
     }
-
+    // 가게 수정
     @PatchMapping("/owner/stores/{storeId}")
     public ResponseEntity<CommonResponseBody<Void>> updateStore(@PathVariable Long storeId,
                                                                 @Valid @RequestBody StoreUpdateRequestDto storeUpdateRequestDto,

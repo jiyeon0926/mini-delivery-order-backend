@@ -41,6 +41,8 @@ public class CustomerOrderService {
         validateStoreOpen(cart.getStore());
 
         List<CartItem> cartItems = cartItemRepository.findAllByCartIdWithMenu(cart.getId());
+        validateCartNotEmpty(cartItems);
+
         int totalAmount = calculateTotalAmount(cartItems);
 
         Order order = Order.create(user, cart.getStore(), address, totalAmount);
@@ -74,6 +76,12 @@ public class CustomerOrderService {
     private void validateStoreOpen(Store store) {
         if (store.isNotOpenStatus()) {
             throw new CustomException(ErrorCode.STORE_NOT_OPEN);
+        }
+    }
+
+    private void validateCartNotEmpty(List<CartItem> cartItems) {
+        if (cartItems.isEmpty()) {
+            throw new CustomException(ErrorCode.CART_ITEM_NOT_FOUND);
         }
     }
 

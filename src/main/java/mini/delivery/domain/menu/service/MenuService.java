@@ -77,7 +77,9 @@ public class MenuService {
                 .orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
         Menu menu = menuRepository.findByIdWithStore(menuId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MENU_NOT_FOUND));
-
+        if(!menu.getStore().getId().equals(storeId)){
+            throw new CustomException(ErrorCode.MENU_NOT_FOUND);
+        }
         menu.deleteMenu();
     }
 }

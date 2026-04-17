@@ -67,6 +67,7 @@ public class CustomerOrderService {
         Order order = orderRepository.findByIdAndUserId(orderId, user.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
 
+        validatePendingStatus(order);
         orderRepository.delete(order);
     }
 
@@ -84,5 +85,11 @@ public class CustomerOrderService {
 
     private void clearCartItem(Cart cart) {
         cartItemRepository.deleteAllByCart(cart);
+    }
+
+    private void validatePendingStatus(Order order) {
+        if (order.isNotPendingStatus()) {
+            throw new CustomException(ErrorCode.ORDER_NOT_IN_PENDING_STATUS);
+        }
     }
 }

@@ -79,4 +79,8 @@ public class Order extends BaseEntity {
     public boolean isNotPendingStatus() {
         return !isPendingStatus();
     }
+
+    public void updateOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
+    }
 }

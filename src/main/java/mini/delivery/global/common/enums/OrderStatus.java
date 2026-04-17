@@ -22,4 +22,13 @@ public enum OrderStatus {
 
         throw new IllegalArgumentException("해당하는 이름의 상태를 찾을 수 없습니다: " + status);
     }
+
+    public boolean canChangeTo(OrderStatus targetStatus) {
+        return switch (this) {
+            case PENDING -> targetStatus == COOKING;
+            case COOKING -> targetStatus == DELIVERING;
+            case DELIVERING -> targetStatus == DELIVERED;
+            case DELIVERED -> false;
+        };
+    }
 }

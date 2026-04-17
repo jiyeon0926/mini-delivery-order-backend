@@ -68,4 +68,16 @@ public class MenuService {
             menu.updatePrice(menuUpdateRequestDto.getPrice());
         }
     }
+
+    @Transactional
+    public void deleteMenu(Long storeId, Long menuId, String email) {
+        User user = userRepository.findByEmailAndIsDeletedFalse(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        storeRepository.findByIdAndUserId(storeId, user.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
+        Menu menu = menuRepository.findByIdWithStore(menuId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MENU_NOT_FOUND));
+
+        menu.deleteMenu();
+    }
 }

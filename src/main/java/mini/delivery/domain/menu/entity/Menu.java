@@ -58,4 +58,8 @@ public class Menu extends BaseEntity {
     public void updatePrice(Integer price){
         this.price = price;
     }
+
+    public void deleteMenu(){
+        this.isDeleted=true;
+    }
 }

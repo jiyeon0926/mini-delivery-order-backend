@@ -19,11 +19,12 @@ import org.springframework.web.bind.annotation.*;
 public class MenuController {
 
     private final MenuService menuService;
+
     // 메뉴 생성
     @PostMapping("/owner/stores/{storeId}/menu")
     public ResponseEntity<CommonResponseBody<MenuCreateResponseDto>> createMenu(@PathVariable Long storeId,
                                                                                 @Valid @RequestBody MenuCreateRequestDto menuCreateRequestDto,
-                                                                               @AuthenticationPrincipal UserDetailsImpl userDetails) {
+                                                                                @AuthenticationPrincipal UserDetailsImpl userDetails) {
         MenuCreateResponseDto menuCreateResponseDto = menuService.createMenu(
                 storeId,
                 menuCreateRequestDto,
@@ -34,12 +35,13 @@ public class MenuController {
                 .status(HttpStatus.CREATED)
                 .body(CommonResponseBody.success("메뉴를 생성하였습니다.", menuCreateResponseDto));
     }
+
     // 메뉴 수정
     @PatchMapping("/owner/stores/{storeId}/menu/{menuId}")
     public ResponseEntity<CommonResponseBody<Void>> updateMenu(@PathVariable Long storeId,
-                                                                                @PathVariable Long menuId,
-                                                                                @Valid @RequestBody MenuUpdateRequestDto menuUpdateRequestDto,
-                                                                                @AuthenticationPrincipal UserDetailsImpl userDetails) {
+                                                               @PathVariable Long menuId,
+                                                               @Valid @RequestBody MenuUpdateRequestDto menuUpdateRequestDto,
+                                                               @AuthenticationPrincipal UserDetailsImpl userDetails) {
         menuService.updateMenu(
                 storeId,
                 menuId,
@@ -50,5 +52,19 @@ public class MenuController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(CommonResponseBody.success("메뉴를 수정하였습니다."));
+    }
+
+    // 메뉴 삭제
+    @DeleteMapping("/owner/stores/{storeId}/menu/{menuId}")
+    public ResponseEntity<Void> deleteMenu(@PathVariable Long storeId,
+                                               @PathVariable Long menuId,
+                                               @AuthenticationPrincipal UserDetailsImpl userDetails){
+        menuService.deleteMenu(
+                storeId,
+                menuId,
+                userDetails.getUsername()
+        );
+
+        return ResponseEntity.noContent().build();
     }
 }

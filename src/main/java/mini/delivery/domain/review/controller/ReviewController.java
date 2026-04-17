@@ -34,4 +34,20 @@ public class ReviewController {
                 .status(HttpStatus.CREATED)
                 .body(CommonResponseBody.success("리뷰를 작성하였습니다.", reviewCreateResponseDto));
     }
+
+    // 리뷰 삭제
+    @DeleteMapping("/owner/stores/{storeId}/reviews/{reviewId}")
+    public ResponseEntity<Void>deleteReview(@PathVariable Long storeId,
+                                            @PathVariable Long reviewId,
+                                            @AuthenticationPrincipal UserDetailsImpl userDetails){
+
+        reviewService.deleteReview(
+                storeId,
+                reviewId,
+                userDetails.getUsername()
+        );
+
+        return ResponseEntity.noContent().build();
+    }
+
 }

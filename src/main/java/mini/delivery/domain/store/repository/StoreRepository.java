@@ -12,4 +12,6 @@ public interface StoreRepository extends JpaRepository<Store, Long>, CustomStore
     long countByUserId(Long userId);
 
     Optional<Store> findByIdAndUserId(Long storeId, Long userId);
+    
+    Optional<Store> findByIdAndUserIdAndIsDeletedFalse(Long storeId, Long userId);
 }

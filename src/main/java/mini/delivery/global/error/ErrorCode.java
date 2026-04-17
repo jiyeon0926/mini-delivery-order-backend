@@ -11,6 +11,8 @@ public enum ErrorCode {
     // 400 BAD_REQUEST
     PASSWORD_NOT_MATCH(BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
     STORE_NOT_OPEN(BAD_REQUEST, "영업 중이 아닙니다."),
+    ORDER_NOT_IN_PENDING_STATUS(BAD_REQUEST, "주문 확인 상태가 아닙니다."),
+    ORDER_INVALID_STATUS_TRANSITION(BAD_REQUEST, "현재 주문 상태에서는 요청한 상태로 변경할 수 없습니다."),
 
     // 404 NOT_FOUND
     USER_NOT_FOUND(NOT_FOUND, "사용자를 찾을 수 없습니다."),

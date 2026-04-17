@@ -41,6 +41,8 @@ public class CustomerOrderService {
         validateStoreOpen(cart.getStore());
 
         List<CartItem> cartItems = cartItemRepository.findAllByCartIdWithMenu(cart.getId());
+        validateCartNotEmpty(cartItems);
+
         int totalAmount = calculateTotalAmount(cartItems);
 
         Order order = Order.create(user, cart.getStore(), address, totalAmount);
@@ -67,12 +69,19 @@ public class CustomerOrderService {
         Order order = orderRepository.findByIdAndUserId(orderId, user.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
 
+        validatePendingStatus(order);
         orderRepository.delete(order);
     }
 
     private void validateStoreOpen(Store store) {
         if (store.isNotOpenStatus()) {
             throw new CustomException(ErrorCode.STORE_NOT_OPEN);
+        }
+    }
+
+    private void validateCartNotEmpty(List<CartItem> cartItems) {
+        if (cartItems.isEmpty()) {
+            throw new CustomException(ErrorCode.CART_ITEM_NOT_FOUND);
         }
     }
 
@@ -84,5 +93,11 @@ public class CustomerOrderService {
 
     private void clearCartItem(Cart cart) {
         cartItemRepository.deleteAllByCart(cart);
+    }
+
+    private void validatePendingStatus(Order order) {
+        if (order.isNotPendingStatus()) {
+            throw new CustomException(ErrorCode.ORDER_NOT_IN_PENDING_STATUS);
+        }
     }
 }

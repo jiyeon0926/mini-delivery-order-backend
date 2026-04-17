@@ -60,6 +60,16 @@ public class CustomerOrderService {
         return OrderCreateResponseDto.from(savedOrder);
     }
 
+    @Transactional
+    public void cancelOrder(Long orderId, String email) {
+        User user = userRepository.findByEmailAndIsDeletedFalse(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        Order order = orderRepository.findByIdAndUserId(orderId, user.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
+
+        orderRepository.delete(order);
+    }
+
     private void validateStoreOpen(Store store) {
         if (store.isNotOpenStatus()) {
             throw new CustomException(ErrorCode.STORE_NOT_OPEN);

@@ -38,14 +38,16 @@ public class CustomerOrderService {
         Cart cart = cartRepository.findByUserIdWithStore(user.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.CART_NOT_FOUND));
 
-        validateStoreOpen(cart.getStore());
+        Store store = cart.getStore();
+        validateStoreOpen(store);
 
         List<CartItem> cartItems = cartItemRepository.findAllByCartIdWithMenu(cart.getId());
         validateCartNotEmpty(cartItems);
 
         int totalAmount = calculateTotalAmount(cartItems);
+        validateMinOrderAmount(store.getMinOrderAmount(), totalAmount);
 
-        Order order = Order.create(user, cart.getStore(), address, totalAmount);
+        Order order = Order.create(user, store, address, totalAmount);
         Order savedOrder = orderRepository.save(order);
 
         List<OrderItem> orderItems = cartItems.stream()
@@ -89,6 +91,12 @@ public class CustomerOrderService {
         return cartItems.stream()
                 .mapToInt(item -> item.getMenu().getPrice() * item.getQuantity())
                 .sum();
+    }
+
+    private void validateMinOrderAmount(int minOrderAmount, int cartTotalAmount) {
+        if (minOrderAmount > cartTotalAmount) {
+            throw new CustomException(ErrorCode.MINIMUM_ORDER_NOT_MET);
+        }
     }
 
     private void clearCartItem(Cart cart) {

@@ -10,6 +10,7 @@ import mini.delivery.domain.review.repository.ReviewRepository;
 import mini.delivery.domain.store.repository.StoreRepository;
 import mini.delivery.domain.user.entity.User;
 import mini.delivery.domain.user.repository.UserRepository;
+import mini.delivery.global.common.enums.OrderStatus;
 import mini.delivery.global.error.CustomException;
 import mini.delivery.global.error.ErrorCode;
 import org.springframework.stereotype.Service;
@@ -32,8 +33,11 @@ public class ReviewService {
                 .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
         if (!order.getUser().getId().equals(user.getId())) {
                 throw new CustomException(ErrorCode.ORDER_NOT_FOUND); 
-        }      
-
+        }
+        if (order.getOrderStatus() != OrderStatus.DELIVERED){
+                throw new CustomException(ErrorCode.ORDER_NOT_DELIVERED);
+        }
+        
     Review review = Review.create(
         user,
         order,

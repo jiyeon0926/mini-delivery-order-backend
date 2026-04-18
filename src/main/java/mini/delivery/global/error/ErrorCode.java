@@ -13,6 +13,7 @@ public enum ErrorCode {
     STORE_NOT_OPEN(BAD_REQUEST, "영업 중이 아닙니다."),
     ORDER_NOT_IN_PENDING_STATUS(BAD_REQUEST, "주문 확인 상태가 아닙니다."),
     ORDER_INVALID_STATUS_TRANSITION(BAD_REQUEST, "현재 주문 상태에서는 요청한 상태로 변경할 수 없습니다."),
+    ORDER_NOT_DELIVERED(BAD_REQUEST, "배달이 완료된 주문만 리뷰를 작성할 수 있습니다."),
 
     // 404 NOT_FOUND
     USER_NOT_FOUND(NOT_FOUND, "사용자를 찾을 수 없습니다."),

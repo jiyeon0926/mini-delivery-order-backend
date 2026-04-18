@@ -63,6 +63,10 @@ public class User extends BaseEntity {
         return new User(email, password, nickname, Role.OWNER);
     }
 
+    public boolean isOwner() {
+        return role.equals(Role.OWNER);
+    }
+
     public void updateNickname(String nickname) {
         this.nickname = nickname;
     }

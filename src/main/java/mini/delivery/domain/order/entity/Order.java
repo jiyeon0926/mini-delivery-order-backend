@@ -83,4 +83,8 @@ public class Order extends BaseEntity {
     public void updateOrderStatus(OrderStatus orderStatus) {
         this.orderStatus = orderStatus;
     }
+
+    public void rejectionReason(String rejectionReason) {
+        this.rejectionReason = rejectionReason;
+    }
 }

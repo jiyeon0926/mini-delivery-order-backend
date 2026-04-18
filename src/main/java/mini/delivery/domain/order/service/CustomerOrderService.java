@@ -38,12 +38,16 @@ public class CustomerOrderService {
         Cart cart = cartRepository.findByUserIdWithStore(user.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.CART_NOT_FOUND));
 
-        validateStoreOpen(cart.getStore());
+        Store store = cart.getStore();
+        validateStoreOpen(store);
 
         List<CartItem> cartItems = cartItemRepository.findAllByCartIdWithMenu(cart.getId());
-        int totalAmount = calculateTotalAmount(cartItems);
+        validateCartNotEmpty(cartItems);
 
-        Order order = Order.create(user, cart.getStore(), address, totalAmount);
+        int totalAmount = calculateTotalAmount(cartItems);
+        validateMinOrderAmount(store.getMinOrderAmount(), totalAmount);
+
+        Order order = Order.create(user, store, address, totalAmount);
         Order savedOrder = orderRepository.save(order);
 
         List<OrderItem> orderItems = cartItems.stream()
@@ -60,9 +64,26 @@ public class CustomerOrderService {
         return OrderCreateResponseDto.from(savedOrder);
     }
 
+    @Transactional
+    public void cancelOrder(Long orderId, String email) {
+        User user = userRepository.findByEmailAndIsDeletedFalse(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        Order order = orderRepository.findByIdAndUserId(orderId, user.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
+
+        validatePendingStatus(order);
+        orderRepository.delete(order);
+    }
+
     private void validateStoreOpen(Store store) {
         if (store.isNotOpenStatus()) {
             throw new CustomException(ErrorCode.STORE_NOT_OPEN);
+        }
+    }
+
+    private void validateCartNotEmpty(List<CartItem> cartItems) {
+        if (cartItems.isEmpty()) {
+            throw new CustomException(ErrorCode.CART_ITEM_NOT_FOUND);
         }
     }
 
@@ -72,7 +93,19 @@ public class CustomerOrderService {
                 .sum();
     }
 
+    private void validateMinOrderAmount(int minOrderAmount, int cartTotalAmount) {
+        if (minOrderAmount > cartTotalAmount) {
+            throw new CustomException(ErrorCode.MINIMUM_ORDER_NOT_MET);
+        }
+    }
+
     private void clearCartItem(Cart cart) {
         cartItemRepository.deleteAllByCart(cart);
+    }
+
+    private void validatePendingStatus(Order order) {
+        if (order.isNotPendingStatus()) {
+            throw new CustomException(ErrorCode.ORDER_NOT_IN_PENDING_STATUS);
+        }
     }
 }

@@ -45,4 +45,8 @@ public class Review extends BaseEntity {
     public static Review create(User user, Order order, int rating, String content) {
         return new Review(user, order, rating, content);
     }
+
+    public void deleteReview(){
+        this.isDeleted=true;
+    }
 }

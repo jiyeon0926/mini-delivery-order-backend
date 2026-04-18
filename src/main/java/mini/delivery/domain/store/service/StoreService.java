@@ -49,7 +49,7 @@ public class StoreService {
     public void updateStore(Long storeId, StoreUpdateRequestDto storeUpdateRequestDto, String email) {
         User user = userRepository.findByEmailAndIsDeletedFalse(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        Store store = storeRepository.findByIdAndUserId(storeId, user.getId())
+        Store store = storeRepository.findByIdAndUserIdAndIsDeletedFalse(storeId, user.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
 
         if (storeUpdateRequestDto.getName() != null) {
@@ -93,7 +93,7 @@ public class StoreService {
     public StoreStatusChangeResponseDto storeStatus(Long storeId, String storeStatus, String email) {
         User user = userRepository.findByEmailAndIsDeletedFalse(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        Store store = storeRepository.findByIdAndUserId(storeId, user.getId())
+        Store store = storeRepository.findByIdAndUserIdAndIsDeletedFalse(storeId, user.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
 
         store.updateStoreStatus(StoreStatus.of(storeStatus));
@@ -105,7 +105,7 @@ public class StoreService {
     public void closeStore(Long storeId, String email){
         User user = userRepository.findByEmailAndIsDeletedFalse(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        Store store = storeRepository.findByIdAndUserId(storeId, user.getId())
+        Store store = storeRepository.findByIdAndUserIdAndIsDeletedFalse(storeId, user.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
 
         store.deleteStore();

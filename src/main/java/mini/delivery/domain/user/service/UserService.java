@@ -1,6 +1,7 @@
 package mini.delivery.domain.user.service;
 
 import lombok.RequiredArgsConstructor;
+import mini.delivery.domain.store.repository.StoreRepository;
 import mini.delivery.domain.user.dto.NicknameResponseDto;
 import mini.delivery.domain.user.dto.UserResponseDto;
 import mini.delivery.domain.user.entity.User;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final StoreRepository storeRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
@@ -41,6 +43,8 @@ public class UserService {
     public void deleteUser(String email) {
         User user = userRepository.findByEmailAndIsDeletedFalse(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        validateWithDrawable(user);
         user.delete();
     }
 
@@ -54,9 +58,15 @@ public class UserService {
 
     private void validatePassword(String rawPassword, String encodedPassword) {
         boolean isNotValid = !passwordEncoder.matches(rawPassword, encodedPassword);
-
         if (isNotValid) {
             throw new CustomException(ErrorCode.PASSWORD_NOT_MATCH);
+        }
+    }
+
+    private void validateWithDrawable(User user) {
+        boolean hasActiveStore = storeRepository.existsByUserIdAndIsDeletedFalse(user.getId());
+        if (user.isOwner() && hasActiveStore) {
+            throw new CustomException(ErrorCode.CANNOT_WITHDRAW_WITH_ACTIVE_STORE);
         }
     }
 }

@@ -102,13 +102,29 @@ public class StoreService {
     }
 
     @Transactional
-    public void closeStore(Long storeId, String email){
+    public void closeStore(Long storeId, String email) {
         User user = userRepository.findByEmailAndIsDeletedFalse(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         Store store = storeRepository.findByIdAndUserIdAndIsDeletedFalse(storeId, user.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
 
         store.deleteStore();
+    }
+
+    @Transactional(readOnly = true)
+    public List<OwnerStoreResponseDto> allFindStore(String email) {
+        User user = userRepository.findByEmailAndIsDeletedFalse(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        List<Store> stores = storeRepository.findAllByUserId(user.getId());
+
+        return stores.stream()
+                .map(store -> {
+                    double averageRating = reviewRepository.averageRatingByStoreId(store.getId());
+                    long reviewCount = reviewRepository.countByStoreId(store.getId());
+
+                    return OwnerStoreResponseDto.from(store, averageRating, reviewCount);
+                })
+                .toList();
     }
 
     private void validateStoreLimit(Long userId) {

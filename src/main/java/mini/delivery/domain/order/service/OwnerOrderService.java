@@ -1,6 +1,7 @@
 package mini.delivery.domain.order.service;
 
 import lombok.RequiredArgsConstructor;
+import mini.delivery.domain.order.dto.OrderRejectResponseDto;
 import mini.delivery.domain.order.dto.OrderStatusUpdateResponseDto;
 import mini.delivery.domain.order.entity.Order;
 import mini.delivery.domain.order.repository.OrderRepository;
@@ -33,11 +34,32 @@ public class OwnerOrderService {
         return OrderStatusUpdateResponseDto.from(order);
     }
 
+    @Transactional
+    public OrderRejectResponseDto rejectOrder(Long storeId, Long orderId, String rejectionReason, String email) {
+        User user = userRepository.findByEmailAndIsDeletedFalse(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        Order order = orderRepository.findByIdAndStoreIdAndOwnerId(orderId, storeId, user.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
+
+        validatePendingStatus(order);
+
+        order.updateOrderStatus(OrderStatus.REJECTED);
+        order.rejectionReason(rejectionReason);
+
+        return OrderRejectResponseDto.from(order);
+    }
+
     // 현재 주문 상태에서 요청한 상태로 변경 가능한지 검증
     private void validateOrderStatus(Order order, OrderStatus targetStatus) {
         OrderStatus currentStatus = order.getOrderStatus();
         if (!currentStatus.canChangeTo(targetStatus)) {
             throw new CustomException(ErrorCode.ORDER_INVALID_STATUS_TRANSITION);
+        }
+    }
+
+    private void validatePendingStatus(Order order) {
+        if (order.isNotPendingStatus()) {
+            throw new CustomException(ErrorCode.ORDER_NOT_IN_PENDING_STATUS);
         }
     }
 }

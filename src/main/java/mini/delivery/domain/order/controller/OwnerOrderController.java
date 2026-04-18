@@ -1,6 +1,9 @@
 package mini.delivery.domain.order.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import mini.delivery.domain.order.dto.OrderRejectRequestDto;
+import mini.delivery.domain.order.dto.OrderRejectResponseDto;
 import mini.delivery.domain.order.dto.OrderStatusUpdateRequestDto;
 import mini.delivery.domain.order.dto.OrderStatusUpdateResponseDto;
 import mini.delivery.domain.order.service.OwnerOrderService;
@@ -33,5 +36,22 @@ public class OwnerOrderController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(CommonResponseBody.success("주문 상태를 변경하였습니다.", orderStatusUpdateResponseDto));
+    }
+
+    @PatchMapping("/{orderId}/reject")
+    public ResponseEntity<CommonResponseBody<OrderRejectResponseDto>> rejectOrder(@PathVariable Long storeId,
+                                                                                  @PathVariable Long orderId,
+                                                                                  @Valid @RequestBody OrderRejectRequestDto orderRejectRequestDto,
+                                                                                  @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        OrderRejectResponseDto orderRejectResponseDto = ownerOrderService.rejectOrder(
+                storeId,
+                orderId,
+                orderRejectRequestDto.getRejectionReason(),
+                userDetails.getUsername()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommonResponseBody.success("주문을 거절하였습니다.", orderRejectResponseDto));
     }
 }

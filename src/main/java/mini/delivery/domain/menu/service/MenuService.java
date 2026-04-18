@@ -48,19 +48,9 @@ public class MenuService {
         User user = userRepository.findByEmailAndIsDeletedFalse(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        // 내 가게 인지(사장 권한) 확인
-        storeRepository.findByIdAndUserId(storeId, user.getId())
-                .orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
-
-        // 메뉴 조회 (stroe까지 같이 가져오기)
-        Menu menu = menuRepository.findByIdWithStore(menuId)
+        Menu menu = menuRepository.findByIdAndStoreIdAndUserId(menuId, storeId, user.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.MENU_NOT_FOUND));
 
-        // 이 메뉴가 해당 storeId의 소속인지 확인
-        if(!menu.getStore().getId().equals(storeId)) {
-            throw new CustomException(ErrorCode.MENU_NOT_FOUND);
-        }
-        
         if (menuUpdateRequestDto.getName() != null) {
             menu.updateName(menuUpdateRequestDto.getName());
         }
@@ -73,13 +63,8 @@ public class MenuService {
     public void deleteMenu(Long storeId, Long menuId, String email) {
         User user = userRepository.findByEmailAndIsDeletedFalse(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        storeRepository.findByIdAndUserId(storeId, user.getId())
-                .orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
-        Menu menu = menuRepository.findByIdWithStore(menuId)
+        Menu menu = menuRepository.findByIdAndStoreIdAndUserId(menuId, storeId, user.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.MENU_NOT_FOUND));
-        if(!menu.getStore().getId().equals(storeId)){
-            throw new CustomException(ErrorCode.MENU_NOT_FOUND);
-        }
         menu.deleteMenu();
     }
 }

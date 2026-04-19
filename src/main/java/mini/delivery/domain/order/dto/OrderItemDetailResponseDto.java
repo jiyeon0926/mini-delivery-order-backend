@@ -4,7 +4,7 @@ import lombok.Getter;
 import mini.delivery.domain.order.entity.OrderItem;
 
 @Getter
-public class CustomerOrderItemDetailResponseDto {
+public class OrderItemDetailResponseDto {
 
     private final Long itemId;
     private final Long menuId;
@@ -13,7 +13,7 @@ public class CustomerOrderItemDetailResponseDto {
     private final int quantity;
     private final int totalPrice;
 
-    private CustomerOrderItemDetailResponseDto(Long itemId, Long menuId, String menuName, int price, int quantity, int totalPrice) {
+    private OrderItemDetailResponseDto(Long itemId, Long menuId, String menuName, int price, int quantity, int totalPrice) {
         this.itemId = itemId;
         this.menuId = menuId;
         this.menuName = menuName;
@@ -22,8 +22,8 @@ public class CustomerOrderItemDetailResponseDto {
         this.totalPrice = totalPrice;
     }
 
-    public static CustomerOrderItemDetailResponseDto from(OrderItem orderItem, int totalPrice) {
-        return new CustomerOrderItemDetailResponseDto(
+    public static OrderItemDetailResponseDto from(OrderItem orderItem, int totalPrice) {
+        return new OrderItemDetailResponseDto(
                 orderItem.getId(),
                 orderItem.getMenu().getId(),
                 orderItem.getMenu().getName(),

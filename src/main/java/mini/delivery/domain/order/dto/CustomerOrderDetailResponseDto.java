@@ -18,9 +18,9 @@ public class CustomerOrderDetailResponseDto {
     private final String rejectionReason;
     private final LocalDateTime createdAt;
     private final int totalAmount;
-    private final List<CustomerOrderItemDetailResponseDto> items;
+    private final List<OrderItemDetailResponseDto> items;
 
-    private CustomerOrderDetailResponseDto(Long orderId, Long storeId, String storeName, String orderNumber, String customerAddress, String orderStatus, String rejectionReason, LocalDateTime createdAt, int totalAmount, List<CustomerOrderItemDetailResponseDto> items) {
+    private CustomerOrderDetailResponseDto(Long orderId, Long storeId, String storeName, String orderNumber, String customerAddress, String orderStatus, String rejectionReason, LocalDateTime createdAt, int totalAmount, List<OrderItemDetailResponseDto> items) {
         this.orderId = orderId;
         this.storeId = storeId;
         this.storeName = storeName;
@@ -33,7 +33,7 @@ public class CustomerOrderDetailResponseDto {
         this.items = items;
     }
 
-    public static CustomerOrderDetailResponseDto from(Order order, List<CustomerOrderItemDetailResponseDto> items) {
+    public static CustomerOrderDetailResponseDto from(Order order, List<OrderItemDetailResponseDto> items) {
         return new CustomerOrderDetailResponseDto(
                 order.getId(),
                 order.getStore().getId(),

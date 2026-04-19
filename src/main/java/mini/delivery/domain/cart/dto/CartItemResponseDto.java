@@ -3,8 +3,6 @@ package mini.delivery.domain.cart.dto;
 import lombok.Getter;
 import mini.delivery.domain.cart.entity.CartItem;
 
-import java.util.List;
-
 @Getter
 public class CartItemResponseDto {
 
@@ -33,9 +31,5 @@ public class CartItemResponseDto {
                 cartItem.getQuantity(),
                 totalPrice
         );
-    }
-
-    public static List<CartItemResponseDto> from(List<CartItemResponseDto> cartItemResponseDtoList) {
-        return cartItemResponseDtoList;
     }
 }

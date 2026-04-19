@@ -27,14 +27,14 @@ public class CustomerOrderResponseDto {
         this.items = items;
     }
 
-    public static CustomerOrderResponseDto from(Order order, int totalAmount, List<CustomerOrderItemResponseDto> items) {
+    public static CustomerOrderResponseDto from(Order order, List<CustomerOrderItemResponseDto> items) {
         return new CustomerOrderResponseDto(
                 order.getId(),
                 order.getStore().getId(),
                 order.getStore().getName(),
                 order.getCreatedAt(),
                 order.getOrderStatus().name(),
-                totalAmount,
+                order.getTotalAmount(),
                 items
         );
     }

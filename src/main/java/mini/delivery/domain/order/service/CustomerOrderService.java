@@ -6,9 +6,7 @@ import mini.delivery.domain.cart.entity.CartItem;
 import mini.delivery.domain.cart.repository.CartItemRepository;
 import mini.delivery.domain.cart.repository.CartRepository;
 import mini.delivery.domain.menu.entity.Menu;
-import mini.delivery.domain.order.dto.CustomerOrderItemResponseDto;
-import mini.delivery.domain.order.dto.CustomerOrderResponseDto;
-import mini.delivery.domain.order.dto.OrderCreateResponseDto;
+import mini.delivery.domain.order.dto.*;
 import mini.delivery.domain.order.entity.Order;
 import mini.delivery.domain.order.entity.OrderItem;
 import mini.delivery.domain.order.repository.OrderItemRepository;
@@ -86,11 +84,22 @@ public class CustomerOrderService {
         return orders.stream()
                 .map(order -> {
                     List<OrderItem> orderItems = orderItemRepository.findAllByOrderIdWithMenu(order.getId());
-                    int totalAmount = calculateOrderTotalAmount(orderItems);
 
-                    return CustomerOrderResponseDto.from(order, totalAmount, CustomerOrderItemResponseDto.from(orderItems));
+                    return CustomerOrderResponseDto.from(order, CustomerOrderItemResponseDto.from(orderItems));
                 })
                 .toList();
+    }
+
+    public CustomerOrderDetailResponseDto getOrderDetail(Long orderId, String email) {
+        User user = userRepository.findByEmailAndIsDeletedFalse(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        Order order = orderRepository.findByIdAndUserIdWithStore(orderId, user.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
+
+        List<OrderItem> orderItems = orderItemRepository.findAllByOrderIdWithMenu(orderId);
+        List<CustomerOrderItemDetailResponseDto> customerOrderItemDetailResponseDtoList = toOrderItemDetailResponses(orderItems);
+
+        return CustomerOrderDetailResponseDto.from(order, customerOrderItemDetailResponseDtoList);
     }
 
     private void validateStoreOpen(Store store) {
@@ -127,9 +136,13 @@ public class CustomerOrderService {
         }
     }
 
-    private int calculateOrderTotalAmount(List<OrderItem> orderItems) {
-        return orderItems.stream()
-                .mapToInt(item -> item.getMenu().getPrice() * item.getQuantity())
-                .sum();
+    private List<CustomerOrderItemDetailResponseDto> toOrderItemDetailResponses(List<OrderItem> items) {
+        return items.stream()
+                .map(item -> {
+                    int totalPrice = item.getPrice() * item.getQuantity();
+
+                    return CustomerOrderItemDetailResponseDto.from(item, totalPrice);
+                })
+                .toList();
     }
 }

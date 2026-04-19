@@ -2,6 +2,7 @@ package mini.delivery.domain.order.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import mini.delivery.domain.order.dto.CustomerOrderDetailResponseDto;
 import mini.delivery.domain.order.dto.CustomerOrderResponseDto;
 import mini.delivery.domain.order.dto.OrderCreateRequestDto;
 import mini.delivery.domain.order.dto.OrderCreateResponseDto;
@@ -50,5 +51,15 @@ public class CustomerOrderController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(CommonResponseBody.success("주문 내역 조회를 성공하였습니다.", customerOrderResponseDtoList));
+    }
+
+    @GetMapping("/{orderId}")
+    public ResponseEntity<CommonResponseBody<CustomerOrderDetailResponseDto>> getOrderDetail(@PathVariable Long orderId,
+                                                                                             @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        CustomerOrderDetailResponseDto customerOrderDetailResponseDto = customerOrderService.getOrderDetail(orderId, userDetails.getUsername());
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommonResponseBody.success("주문 조회를 성공하였습니다.", customerOrderDetailResponseDto));
     }
 }

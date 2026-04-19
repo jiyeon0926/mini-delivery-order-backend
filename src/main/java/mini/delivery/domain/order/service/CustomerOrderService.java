@@ -6,9 +6,7 @@ import mini.delivery.domain.cart.entity.CartItem;
 import mini.delivery.domain.cart.repository.CartItemRepository;
 import mini.delivery.domain.cart.repository.CartRepository;
 import mini.delivery.domain.menu.entity.Menu;
-import mini.delivery.domain.order.dto.CustomerOrderItemResponseDto;
-import mini.delivery.domain.order.dto.CustomerOrderResponseDto;
-import mini.delivery.domain.order.dto.OrderCreateResponseDto;
+import mini.delivery.domain.order.dto.*;
 import mini.delivery.domain.order.entity.Order;
 import mini.delivery.domain.order.entity.OrderItem;
 import mini.delivery.domain.order.repository.OrderItemRepository;
@@ -92,6 +90,18 @@ public class CustomerOrderService {
                 .toList();
     }
 
+    public CustomerOrderDetailResponseDto getOrderDetail(Long orderId, String email) {
+        User user = userRepository.findByEmailAndIsDeletedFalse(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        Order order = orderRepository.findByIdAndUserIdWithStore(orderId, user.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
+
+        List<OrderItem> orderItems = orderItemRepository.findAllByOrderIdWithMenu(orderId);
+        List<CustomerOrderItemDetailResponseDto> customerOrderItemDetailResponseDtoList = toOrderItemDetailResponses(orderItems);
+
+        return CustomerOrderDetailResponseDto.from(order, customerOrderItemDetailResponseDtoList);
+    }
+
     private void validateStoreOpen(Store store) {
         if (store.isNotOpenStatus()) {
             throw new CustomException(ErrorCode.STORE_NOT_OPEN);
@@ -124,5 +134,15 @@ public class CustomerOrderService {
         if (order.isNotPendingStatus()) {
             throw new CustomException(ErrorCode.ORDER_NOT_IN_PENDING_STATUS);
         }
+    }
+
+    private List<CustomerOrderItemDetailResponseDto> toOrderItemDetailResponses(List<OrderItem> items) {
+        return items.stream()
+                .map(item -> {
+                    int totalPrice = item.getPrice() * item.getQuantity();
+
+                    return CustomerOrderItemDetailResponseDto.from(item, totalPrice);
+                })
+                .toList();
     }
 }

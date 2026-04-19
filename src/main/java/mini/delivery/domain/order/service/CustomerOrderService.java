@@ -86,9 +86,8 @@ public class CustomerOrderService {
         return orders.stream()
                 .map(order -> {
                     List<OrderItem> orderItems = orderItemRepository.findAllByOrderIdWithMenu(order.getId());
-                    int totalAmount = calculateOrderTotalAmount(orderItems);
 
-                    return CustomerOrderResponseDto.from(order, totalAmount, CustomerOrderItemResponseDto.from(orderItems));
+                    return CustomerOrderResponseDto.from(order, CustomerOrderItemResponseDto.from(orderItems));
                 })
                 .toList();
     }
@@ -125,11 +124,5 @@ public class CustomerOrderService {
         if (order.isNotPendingStatus()) {
             throw new CustomException(ErrorCode.ORDER_NOT_IN_PENDING_STATUS);
         }
-    }
-
-    private int calculateOrderTotalAmount(List<OrderItem> orderItems) {
-        return orderItems.stream()
-                .mapToInt(item -> item.getMenu().getPrice() * item.getQuantity())
-                .sum();
     }
 }

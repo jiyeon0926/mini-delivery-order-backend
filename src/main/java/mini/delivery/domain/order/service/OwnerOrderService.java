@@ -1,14 +1,13 @@
 package mini.delivery.domain.order.service;
 
 import lombok.RequiredArgsConstructor;
-import mini.delivery.domain.order.dto.OrderItemDetailResponseDto;
-import mini.delivery.domain.order.dto.OrderRejectResponseDto;
-import mini.delivery.domain.order.dto.OrderStatusUpdateResponseDto;
-import mini.delivery.domain.order.dto.OwnerOrderDetailResponseDto;
+import mini.delivery.domain.order.dto.*;
 import mini.delivery.domain.order.entity.Order;
 import mini.delivery.domain.order.entity.OrderItem;
 import mini.delivery.domain.order.repository.OrderItemRepository;
 import mini.delivery.domain.order.repository.OrderRepository;
+import mini.delivery.domain.store.entity.Store;
+import mini.delivery.domain.store.repository.StoreRepository;
 import mini.delivery.domain.user.entity.User;
 import mini.delivery.domain.user.repository.UserRepository;
 import mini.delivery.global.common.enums.OrderStatus;
@@ -26,6 +25,7 @@ public class OwnerOrderService {
     private final OrderRepository orderRepository;
     private final OrderItemRepository orderItemRepository;
     private final UserRepository userRepository;
+    private final StoreRepository storeRepository;
 
     @Transactional
     public OrderStatusUpdateResponseDto updateOrderStatus(Long storeId, Long orderId, String orderStatus, String email) {
@@ -54,6 +54,17 @@ public class OwnerOrderService {
         order.rejectionReason(rejectionReason);
 
         return OrderRejectResponseDto.from(order);
+    }
+
+    @Transactional(readOnly = true)
+    public OwnerStoreOrderResponseDto getOrdersByStoreId(Long storeId, String email) {
+        User user = userRepository.findByEmailAndIsDeletedFalse(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        Store store = storeRepository.findByIdAndUserId(storeId, user.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
+        List<Order> orders = orderRepository.findAllByStoreId(storeId);
+
+        return OwnerStoreOrderResponseDto.from(store, OwnerOrderSummaryResponseDto.from(orders));
     }
 
     @Transactional(readOnly = true)

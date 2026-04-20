@@ -52,6 +52,16 @@ public class OwnerOrderController {
                 .body(CommonResponseBody.success("주문을 거절하였습니다.", orderRejectResponseDto));
     }
 
+    @GetMapping
+    public ResponseEntity<CommonResponseBody<OwnerStoreOrderResponseDto>> getOrdersByStoreId(@PathVariable Long storeId,
+                                                                                             @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        OwnerStoreOrderResponseDto ownerStoreOrderResponseDto = ownerOrderService.getOrdersByStoreId(storeId, userDetails.getUsername());
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommonResponseBody.success("가게 주문 목록 조회를 성공하였습니다.", ownerStoreOrderResponseDto));
+    }
+
     @GetMapping("/{orderId}")
     public ResponseEntity<CommonResponseBody<OwnerOrderDetailResponseDto>> getOrderDetail(@PathVariable Long storeId,
                                                                                           @PathVariable Long orderId,

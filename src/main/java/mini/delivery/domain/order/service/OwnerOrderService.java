@@ -1,9 +1,13 @@
 package mini.delivery.domain.order.service;
 
 import lombok.RequiredArgsConstructor;
+import mini.delivery.domain.order.dto.OrderItemDetailResponseDto;
 import mini.delivery.domain.order.dto.OrderRejectResponseDto;
 import mini.delivery.domain.order.dto.OrderStatusUpdateResponseDto;
+import mini.delivery.domain.order.dto.OwnerOrderDetailResponseDto;
 import mini.delivery.domain.order.entity.Order;
+import mini.delivery.domain.order.entity.OrderItem;
+import mini.delivery.domain.order.repository.OrderItemRepository;
 import mini.delivery.domain.order.repository.OrderRepository;
 import mini.delivery.domain.user.entity.User;
 import mini.delivery.domain.user.repository.UserRepository;
@@ -13,11 +17,14 @@ import mini.delivery.global.error.ErrorCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class OwnerOrderService {
 
     private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
     private final UserRepository userRepository;
 
     @Transactional
@@ -49,6 +56,19 @@ public class OwnerOrderService {
         return OrderRejectResponseDto.from(order);
     }
 
+    @Transactional(readOnly = true)
+    public OwnerOrderDetailResponseDto getOrderDetail(Long storeId, Long orderId, String email) {
+        User user = userRepository.findByEmailAndIsDeletedFalse(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        Order order = orderRepository.findByIdAndStoreIdAndOwnerId(orderId, storeId, user.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
+
+        List<OrderItem> orderItems = orderItemRepository.findAllByOrderIdWithMenu(orderId);
+        List<OrderItemDetailResponseDto> orderItemDetailResponseDtoList = toOrderItemDetailResponses(orderItems);
+
+        return OwnerOrderDetailResponseDto.from(order, orderItemDetailResponseDtoList);
+    }
+
     // 현재 주문 상태에서 요청한 상태로 변경 가능한지 검증
     private void validateOrderStatus(Order order, OrderStatus targetStatus) {
         OrderStatus currentStatus = order.getOrderStatus();
@@ -61,5 +81,15 @@ public class OwnerOrderService {
         if (order.isNotPendingStatus()) {
             throw new CustomException(ErrorCode.ORDER_NOT_IN_PENDING_STATUS);
         }
+    }
+
+    private List<OrderItemDetailResponseDto> toOrderItemDetailResponses(List<OrderItem> items) {
+        return items.stream()
+                .map(item -> {
+                    int totalPrice = item.getPrice() * item.getQuantity();
+
+                    return OrderItemDetailResponseDto.from(item, totalPrice);
+                })
+                .toList();
     }
 }

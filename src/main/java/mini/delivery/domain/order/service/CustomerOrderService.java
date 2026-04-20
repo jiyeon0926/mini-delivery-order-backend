@@ -97,9 +97,9 @@ public class CustomerOrderService {
                 .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
 
         List<OrderItem> orderItems = orderItemRepository.findAllByOrderIdWithMenu(orderId);
-        List<CustomerOrderItemDetailResponseDto> customerOrderItemDetailResponseDtoList = toOrderItemDetailResponses(orderItems);
+        List<OrderItemDetailResponseDto> orderItemDetailResponseDtoList = toOrderItemDetailResponses(orderItems);
 
-        return CustomerOrderDetailResponseDto.from(order, customerOrderItemDetailResponseDtoList);
+        return CustomerOrderDetailResponseDto.from(order, orderItemDetailResponseDtoList);
     }
 
     private void validateStoreOpen(Store store) {
@@ -136,12 +136,12 @@ public class CustomerOrderService {
         }
     }
 
-    private List<CustomerOrderItemDetailResponseDto> toOrderItemDetailResponses(List<OrderItem> items) {
+    private List<OrderItemDetailResponseDto> toOrderItemDetailResponses(List<OrderItem> items) {
         return items.stream()
                 .map(item -> {
                     int totalPrice = item.getPrice() * item.getQuantity();
 
-                    return CustomerOrderItemDetailResponseDto.from(item, totalPrice);
+                    return OrderItemDetailResponseDto.from(item, totalPrice);
                 })
                 .toList();
     }

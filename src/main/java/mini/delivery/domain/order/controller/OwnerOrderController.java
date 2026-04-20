@@ -2,10 +2,7 @@ package mini.delivery.domain.order.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import mini.delivery.domain.order.dto.OrderRejectRequestDto;
-import mini.delivery.domain.order.dto.OrderRejectResponseDto;
-import mini.delivery.domain.order.dto.OrderStatusUpdateRequestDto;
-import mini.delivery.domain.order.dto.OrderStatusUpdateResponseDto;
+import mini.delivery.domain.order.dto.*;
 import mini.delivery.domain.order.service.OwnerOrderService;
 import mini.delivery.global.auth.UserDetailsImpl;
 import mini.delivery.global.common.dto.CommonResponseBody;
@@ -53,5 +50,20 @@ public class OwnerOrderController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(CommonResponseBody.success("주문을 거절하였습니다.", orderRejectResponseDto));
+    }
+
+    @GetMapping("/{orderId}")
+    public ResponseEntity<CommonResponseBody<OwnerOrderDetailResponseDto>> getOrderDetail(@PathVariable Long storeId,
+                                                                                          @PathVariable Long orderId,
+                                                                                          @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        OwnerOrderDetailResponseDto ownerOrderDetailResponseDto = ownerOrderService.getOrderDetail(
+                storeId,
+                orderId,
+                userDetails.getUsername()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommonResponseBody.success("가게 주문 조회를 성공하였습니다.", ownerOrderDetailResponseDto));
     }
 }

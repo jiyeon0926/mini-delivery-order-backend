@@ -5,6 +5,7 @@ import mini.delivery.domain.order.entity.Order;
 import mini.delivery.domain.order.repository.OrderRepository;
 import mini.delivery.domain.review.dto.ReviewCreateRequestDto;
 import mini.delivery.domain.review.dto.ReviewCreateResponseDto;
+import mini.delivery.domain.review.dto.ReviewOwnerUserResponseDto;
 import mini.delivery.domain.review.entity.Review;
 import mini.delivery.domain.review.repository.ReviewRepository;
 import mini.delivery.domain.store.repository.StoreRepository;
@@ -15,6 +16,8 @@ import mini.delivery.global.error.CustomException;
 import mini.delivery.global.error.ErrorCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -60,5 +63,14 @@ public class ReviewService {
             throw new CustomException(ErrorCode.REVIEW_NOT_FOUND);
         }
         review.deleteReview();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ReviewOwnerUserResponseDto> allFindReview(Long storeId){
+        List<Review> reviews = reviewRepository.findAllByStoreId(storeId);
+
+        return reviews.stream()
+                .map(ReviewOwnerUserResponseDto::from)
+                .toList();
     }
 }

@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import mini.delivery.domain.review.dto.ReviewCreateRequestDto;
 import mini.delivery.domain.review.dto.ReviewCreateResponseDto;
+import mini.delivery.domain.review.dto.ReviewOwnerUserResponseDto;
 import mini.delivery.domain.review.service.ReviewService;
 import mini.delivery.global.auth.UserDetailsImpl;
 import mini.delivery.global.common.dto.CommonResponseBody;
@@ -11,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -49,5 +52,13 @@ public class ReviewController {
 
         return ResponseEntity.noContent().build();
     }
+    // 리뷰 조회 (비로그인 가능)
+    @GetMapping("/stores/{storeId}/reviews")
+    public ResponseEntity<CommonResponseBody<List<ReviewOwnerUserResponseDto>>> allFindReview(@PathVariable Long storeId){
+        List<ReviewOwnerUserResponseDto> reivewOwnerUserResponseDtoList = reviewService.allFindReview(
+                storeId
+        );
 
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResponseBody.success("리뷰 목록 조회를 성공하였습니다.",reivewOwnerUserResponseDtoList));
+    }
 }

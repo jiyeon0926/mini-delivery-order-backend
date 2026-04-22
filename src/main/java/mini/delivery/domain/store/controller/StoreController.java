@@ -93,4 +93,15 @@ public class StoreController {
 
         return ResponseEntity.noContent().build();
     }
+
+    // 가게 다건 조회
+    @GetMapping("/owner/stores")
+    public ResponseEntity<CommonResponseBody<List<OwnerStoreResponseDto>>> allFindStore(@AuthenticationPrincipal UserDetailsImpl userDetails){
+
+        List<OwnerStoreResponseDto> ownerStoreResponseDtoList = storeService.allFindStore(
+                userDetails.getUsername()
+        );
+
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResponseBody.success("가게 다건 조회를 성공 하였습니다.",ownerStoreResponseDtoList));
+    }
 }

@@ -112,13 +112,13 @@ public class CartService {
 
         List<CartItem> items = cartItemRepository.findAllByCartIdWithMenu(cart.getId());
 
-        List<CartItemResponseDto> cartItemResponseDtoList = calculateTotalPrices(items);
+        List<CartItemResponseDto> cartItemResponseDtoList = toCartItemResponses(items);
         int totalAmount = calculateTotalAmount(items);
 
         return CartResponseDto.from(cart, cartItemResponseDtoList, totalAmount);
     }
 
-    private List<CartItemResponseDto> calculateTotalPrices(List<CartItem> items) {
+    private List<CartItemResponseDto> toCartItemResponses(List<CartItem> items) {
         return items.stream()
                 .map(item -> {
                     Menu menu = item.getMenu();

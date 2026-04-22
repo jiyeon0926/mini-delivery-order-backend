@@ -20,4 +20,9 @@ public class RefreshTokenService {
                 TimeUnit.MILLISECONDS
         );
     }
+
+    public void deleteRefreshToken(String email) {
+        String key = "refreshToken:" + email;
+        redisTemplate.delete(key);
+    }
 }

@@ -32,13 +32,13 @@ public class SecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
 
     private static final String[] WHITE_LIST = {
-            "/api/auth/users", "/api/auth/owners", "/api/auth/login", "/api/auth/refresh",
-            "/api/stores", "/api/stores/{storeId}"
+            "/api/auth/users", "/api/auth/owners",
+            "/api/auth/login", "/api/stores/**"
     };
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) {
-        http.cors(AbstractHttpConfigurer::disable)
+        http.cors(cors -> cors.configurationSource(CorsConfig.corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->

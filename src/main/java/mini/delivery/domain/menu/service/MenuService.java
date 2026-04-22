@@ -63,13 +63,8 @@ public class MenuService {
     public void deleteMenu(Long storeId, Long menuId, String email) {
         User user = userRepository.findByEmailAndIsDeletedFalse(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
         Menu menu = menuRepository.findByIdAndStoreIdAndUserId(menuId, storeId, user.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.MENU_NOT_FOUND));
-
-        if(!menu.getStore().getId().equals(storeId)){
-            throw new CustomException(ErrorCode.MENU_NOT_FOUND);
-        }
         menu.deleteMenu();
     }
 }

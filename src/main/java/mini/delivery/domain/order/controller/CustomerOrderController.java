@@ -2,6 +2,8 @@ package mini.delivery.domain.order.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import mini.delivery.domain.order.dto.CustomerOrderDetailResponseDto;
+import mini.delivery.domain.order.dto.CustomerOrderResponseDto;
 import mini.delivery.domain.order.dto.OrderCreateRequestDto;
 import mini.delivery.domain.order.dto.OrderCreateResponseDto;
 import mini.delivery.domain.order.service.CustomerOrderService;
@@ -11,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -38,5 +42,24 @@ public class CustomerOrderController {
         customerOrderService.cancelOrder(orderId, userDetails.getUsername());
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<CommonResponseBody<List<CustomerOrderResponseDto>>> getOrders(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        List<CustomerOrderResponseDto> customerOrderResponseDtoList = customerOrderService.getOrders(userDetails.getUsername());
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommonResponseBody.success("주문 내역 조회를 성공하였습니다.", customerOrderResponseDtoList));
+    }
+
+    @GetMapping("/{orderId}")
+    public ResponseEntity<CommonResponseBody<CustomerOrderDetailResponseDto>> getOrderDetail(@PathVariable Long orderId,
+                                                                                             @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        CustomerOrderDetailResponseDto customerOrderDetailResponseDto = customerOrderService.getOrderDetail(orderId, userDetails.getUsername());
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommonResponseBody.success("주문 조회를 성공하였습니다.", customerOrderDetailResponseDto));
     }
 }

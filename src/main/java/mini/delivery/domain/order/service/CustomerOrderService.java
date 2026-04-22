@@ -6,7 +6,7 @@ import mini.delivery.domain.cart.entity.CartItem;
 import mini.delivery.domain.cart.repository.CartItemRepository;
 import mini.delivery.domain.cart.repository.CartRepository;
 import mini.delivery.domain.menu.entity.Menu;
-import mini.delivery.domain.order.dto.OrderCreateResponseDto;
+import mini.delivery.domain.order.dto.*;
 import mini.delivery.domain.order.entity.Order;
 import mini.delivery.domain.order.entity.OrderItem;
 import mini.delivery.domain.order.repository.OrderItemRepository;
@@ -44,7 +44,7 @@ public class CustomerOrderService {
         List<CartItem> cartItems = cartItemRepository.findAllByCartIdWithMenu(cart.getId());
         validateCartNotEmpty(cartItems);
 
-        int totalAmount = calculateTotalAmount(cartItems);
+        int totalAmount = calculateCartTotalAmount(cartItems);
         validateMinOrderAmount(store.getMinOrderAmount(), totalAmount);
 
         Order order = Order.create(user, store, address, totalAmount);
@@ -75,6 +75,33 @@ public class CustomerOrderService {
         orderRepository.delete(order);
     }
 
+    @Transactional(readOnly = true)
+    public List<CustomerOrderResponseDto> getOrders(String email) {
+        User user = userRepository.findByEmailAndIsDeletedFalse(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        List<Order> orders = orderRepository.findAllByUserIdWithStore(user.getId());
+
+        return orders.stream()
+                .map(order -> {
+                    List<OrderItem> orderItems = orderItemRepository.findAllByOrderIdWithMenu(order.getId());
+
+                    return CustomerOrderResponseDto.from(order, CustomerOrderItemResponseDto.from(orderItems));
+                })
+                .toList();
+    }
+
+    public CustomerOrderDetailResponseDto getOrderDetail(Long orderId, String email) {
+        User user = userRepository.findByEmailAndIsDeletedFalse(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        Order order = orderRepository.findByIdAndUserIdWithStore(orderId, user.getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
+
+        List<OrderItem> orderItems = orderItemRepository.findAllByOrderIdWithMenu(orderId);
+        List<OrderItemDetailResponseDto> orderItemDetailResponseDtoList = toOrderItemDetailResponses(orderItems);
+
+        return CustomerOrderDetailResponseDto.from(order, orderItemDetailResponseDtoList);
+    }
+
     private void validateStoreOpen(Store store) {
         if (store.isNotOpenStatus()) {
             throw new CustomException(ErrorCode.STORE_NOT_OPEN);
@@ -87,7 +114,7 @@ public class CustomerOrderService {
         }
     }
 
-    private int calculateTotalAmount(List<CartItem> cartItems) {
+    private int calculateCartTotalAmount(List<CartItem> cartItems) {
         return cartItems.stream()
                 .mapToInt(item -> item.getMenu().getPrice() * item.getQuantity())
                 .sum();
@@ -107,5 +134,15 @@ public class CustomerOrderService {
         if (order.isNotPendingStatus()) {
             throw new CustomException(ErrorCode.ORDER_NOT_IN_PENDING_STATUS);
         }
+    }
+
+    private List<OrderItemDetailResponseDto> toOrderItemDetailResponses(List<OrderItem> items) {
+        return items.stream()
+                .map(item -> {
+                    int totalPrice = item.getPrice() * item.getQuantity();
+
+                    return OrderItemDetailResponseDto.from(item, totalPrice);
+                })
+                .toList();
     }
 }

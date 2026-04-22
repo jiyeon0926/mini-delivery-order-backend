@@ -15,6 +15,7 @@ public enum ErrorCode {
     ORDER_INVALID_STATUS_TRANSITION(BAD_REQUEST, "현재 주문 상태에서는 요청한 상태로 변경할 수 없습니다."),
     ORDER_NOT_DELIVERED(BAD_REQUEST, "배달이 완료된 주문만 리뷰를 작성할 수 있습니다."),
     MINIMUM_ORDER_NOT_MET(BAD_REQUEST, "최소 주문 금액을 충족하지 못했습니다."),
+    CANNOT_WITHDRAW_WITH_ACTIVE_STORE(BAD_REQUEST, "운영 중인 가게가 있어 탈퇴할 수 없습니다."),
 
     // 404 NOT_FOUND
     USER_NOT_FOUND(NOT_FOUND, "사용자를 찾을 수 없습니다."),

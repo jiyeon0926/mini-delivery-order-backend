@@ -66,6 +66,10 @@ public class AuthService {
         return AuthTokenResponseDto.of(AuthenticationScheme.BEARER.getName(), accessToken, refreshToken, user.getRole().name());
     }
 
+    public void logout(String email) {
+        refreshTokenService.deleteRefreshToken(email);
+    }
+
     private void validateDuplicateEmail(String email) {
         boolean exists = userRepository.existsByEmail(email);
         if (exists) {

@@ -7,9 +7,11 @@ import mini.delivery.domain.auth.dto.LoginRequestDto;
 import mini.delivery.domain.auth.dto.SignupRequestDto;
 import mini.delivery.domain.auth.dto.SignupResponseDto;
 import mini.delivery.domain.auth.service.AuthService;
+import mini.delivery.global.auth.UserDetailsImpl;
 import mini.delivery.global.common.dto.CommonResponseBody;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -58,5 +60,12 @@ public class AuthController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(CommonResponseBody.success("로그인을 성공했습니다.", authTokenResponseDto));
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        authService.logout(userDetails.getUsername());
+
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

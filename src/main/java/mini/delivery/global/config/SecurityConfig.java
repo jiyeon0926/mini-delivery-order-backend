@@ -32,8 +32,9 @@ public class SecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
 
     private static final String[] WHITE_LIST = {
-            "/api/auth/users", "/api/auth/owners", "/api/auth/login", "/api/auth/refresh",
-            "/api/stores", "/api/stores/{storeId}"
+            "/api/auth/users", "/api/auth/owners",
+            "/api/auth/login", "/api/auth/refresh",
+            "/api/stores/**"
     };
 
     @Bean

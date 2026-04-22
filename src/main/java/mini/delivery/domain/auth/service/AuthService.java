@@ -63,7 +63,7 @@ public class AuthService {
         String refreshToken = jwtProvider.generateRefreshToken(authentication);
         refreshTokenService.saveRefreshToken(refreshToken, email, jwtProvider.getRefreshExpiryMillis());
 
-        return AuthTokenResponseDto.of(AuthenticationScheme.BEARER.getName(), accessToken, refreshToken);
+        return AuthTokenResponseDto.of(AuthenticationScheme.BEARER.getName(), accessToken, refreshToken, user.getRole().name());
     }
 
     private void validateDuplicateEmail(String email) {

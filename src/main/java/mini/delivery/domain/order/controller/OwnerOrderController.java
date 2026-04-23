@@ -11,14 +11,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+
 @RestController
-@RequestMapping("/api/owner/stores/{storeId}/orders")
+@RequestMapping("/api/owner")
 @RequiredArgsConstructor
 public class OwnerOrderController {
 
     private final OwnerOrderService ownerOrderService;
 
-    @PatchMapping("/{orderId}/status")
+    @PatchMapping("/stores/{storeId}/orders/{orderId}/status")
     public ResponseEntity<CommonResponseBody<OrderStatusUpdateResponseDto>> updateOrderStatus(@PathVariable Long storeId,
                                                                                               @PathVariable Long orderId,
                                                                                               @RequestBody OrderStatusUpdateRequestDto orderStatusUpdateRequestDto,
@@ -35,7 +37,7 @@ public class OwnerOrderController {
                 .body(CommonResponseBody.success("주문 상태를 변경하였습니다.", orderStatusUpdateResponseDto));
     }
 
-    @PatchMapping("/{orderId}/reject")
+    @PatchMapping("/stores/{storeId}/orders/{orderId}/reject")
     public ResponseEntity<CommonResponseBody<OrderRejectResponseDto>> rejectOrder(@PathVariable Long storeId,
                                                                                   @PathVariable Long orderId,
                                                                                   @Valid @RequestBody OrderRejectRequestDto orderRejectRequestDto,
@@ -52,7 +54,7 @@ public class OwnerOrderController {
                 .body(CommonResponseBody.success("주문을 거절하였습니다.", orderRejectResponseDto));
     }
 
-    @GetMapping
+    @GetMapping("/stores/{storeId}/orders")
     public ResponseEntity<CommonResponseBody<OwnerStoreOrderResponseDto>> getOrdersByStoreId(@PathVariable Long storeId,
                                                                                              @AuthenticationPrincipal UserDetailsImpl userDetails) {
         OwnerStoreOrderResponseDto ownerStoreOrderResponseDto = ownerOrderService.getOrdersByStoreId(storeId, userDetails.getUsername());
@@ -62,7 +64,7 @@ public class OwnerOrderController {
                 .body(CommonResponseBody.success("가게 주문 목록 조회를 성공하였습니다.", ownerStoreOrderResponseDto));
     }
 
-    @GetMapping("/{orderId}")
+    @GetMapping("/stores/{storeId}/orders/{orderId}")
     public ResponseEntity<CommonResponseBody<OwnerOrderDetailResponseDto>> getOrderDetail(@PathVariable Long storeId,
                                                                                           @PathVariable Long orderId,
                                                                                           @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -75,5 +77,15 @@ public class OwnerOrderController {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(CommonResponseBody.success("가게 주문 조회를 성공하였습니다.", ownerOrderDetailResponseDto));
+    }
+
+    @GetMapping("/orders/count")
+    public ResponseEntity<CommonResponseBody<DailyOrderCountResponseDto>> getAllOrderCountByStatus(@RequestParam(value = "date", required = false) LocalDate date,
+                                                                                                   @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        DailyOrderCountResponseDto dailyOrderCountResponseDto = ownerOrderService.getAllOrderCountByStatus(date, userDetails.getUsername());
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommonResponseBody.success("주문 수 조회를 성공하였습니다.", dailyOrderCountResponseDto));
     }
 }

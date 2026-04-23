@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,4 +29,14 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Optional<Order> findByIdAndUserIdWithStore(@Param("id") Long orderId, @Param("userId") Long userId);
 
     List<Order> findAllByStoreId(Long storeId);
+
+    @Query(
+            "SELECT o.orderStatus AS orderStatus, COUNT(o.id) AS count FROM Order o " +
+                    "INNER JOIN o.store s " +
+                    "WHERE s.user.id = :userId AND o.createdAt >= :start AND o.createdAt < :end " +
+                    "GROUP BY o.orderStatus"
+    )
+    List<OrderStatusAndCountOnly> getCountGroupByStatusByOwnerIdAndDate(@Param("userId") Long userId,
+                                                                        @Param("start") LocalDateTime start,
+                                                                        @Param("end") LocalDateTime end);
 }

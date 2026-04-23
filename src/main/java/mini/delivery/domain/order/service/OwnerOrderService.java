@@ -6,6 +6,7 @@ import mini.delivery.domain.order.entity.Order;
 import mini.delivery.domain.order.entity.OrderItem;
 import mini.delivery.domain.order.repository.OrderItemRepository;
 import mini.delivery.domain.order.repository.OrderRepository;
+import mini.delivery.domain.order.repository.OrderStatusAndCountOnly;
 import mini.delivery.domain.store.entity.Store;
 import mini.delivery.domain.store.repository.StoreRepository;
 import mini.delivery.domain.user.entity.User;
@@ -16,7 +17,12 @@ import mini.delivery.global.error.ErrorCode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -80,6 +86,20 @@ public class OwnerOrderService {
         return OwnerOrderDetailResponseDto.from(order, orderItemDetailResponseDtoList);
     }
 
+    @Transactional(readOnly = true)
+    public DailyOrderCountResponseDto getAllOrderCountByStatus(LocalDate date, String email) {
+        User user = userRepository.findByEmailAndIsDeletedFalse(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        ZoneId zone = ZoneId.of("Asia/Seoul");
+        LocalDateTime start = (date != null) ? date.atStartOfDay() : LocalDate.now(zone).atStartOfDay();
+        LocalDateTime end = start.plusDays(1);
+
+        Map<OrderStatus, Long> map = getOrderStatusCountMap(user.getId(), start, end);
+
+        return DailyOrderCountResponseDto.from(start.toLocalDate(), OrderStatusCountResponseDto.from(map));
+    }
+
     // 현재 주문 상태에서 요청한 상태로 변경 가능한지 검증
     private void validateOrderStatus(Order order, OrderStatus targetStatus) {
         OrderStatus currentStatus = order.getOrderStatus();
@@ -102,5 +122,13 @@ public class OwnerOrderService {
                     return OrderItemDetailResponseDto.from(item, totalPrice);
                 })
                 .toList();
+    }
+
+    private Map<OrderStatus, Long> getOrderStatusCountMap(Long userId, LocalDateTime start, LocalDateTime end) {
+        List<OrderStatusAndCountOnly> results = orderRepository.getCountGroupByStatusByOwnerIdAndDate(userId, start, end);
+        Map<OrderStatus, Long> map = new EnumMap<>(OrderStatus.class);
+        results.forEach(result -> map.put(result.getOrderStatus(), result.getCount()));
+
+        return map;
     }
 }

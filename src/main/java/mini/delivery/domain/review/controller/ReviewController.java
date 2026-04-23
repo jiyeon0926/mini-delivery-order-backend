@@ -2,6 +2,7 @@ package mini.delivery.domain.review.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import mini.delivery.domain.review.dto.MyReviewResponseDto;
 import mini.delivery.domain.review.dto.ReviewCreateRequestDto;
 import mini.delivery.domain.review.dto.ReviewCreateResponseDto;
 import mini.delivery.domain.review.dto.ReviewOwnerUserResponseDto;
@@ -60,5 +61,13 @@ public class ReviewController {
         );
 
         return ResponseEntity.status(HttpStatus.OK).body(CommonResponseBody.success("리뷰 목록 조회를 성공하였습니다.",reivewOwnerUserResponseDtoList));
+    }
+
+    // 내 리뷰만 조회 
+    @GetMapping("/reviews/me")
+    public ResponseEntity<CommonResponseBody<List<MyReviewResponseDto>>>FindUserReview(@AuthenticationPrincipal UserDetailsImpl userDetails){
+        List<MyReviewResponseDto> list = reviewService.findUserReview(userDetails.getUsername());
+
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResponseBody.success("내 리뷰 목록 조회를 성공하였습니다.", list));
     }
 }

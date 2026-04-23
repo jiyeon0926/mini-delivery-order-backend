@@ -3,6 +3,7 @@ package mini.delivery.domain.review.service;
 import lombok.RequiredArgsConstructor;
 import mini.delivery.domain.order.entity.Order;
 import mini.delivery.domain.order.repository.OrderRepository;
+import mini.delivery.domain.review.dto.MyReviewResponseDto;
 import mini.delivery.domain.review.dto.ReviewCreateRequestDto;
 import mini.delivery.domain.review.dto.ReviewCreateResponseDto;
 import mini.delivery.domain.review.dto.ReviewOwnerUserResponseDto;
@@ -71,6 +72,18 @@ public class ReviewService {
 
         return reviews.stream()
                 .map(ReviewOwnerUserResponseDto::from)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<MyReviewResponseDto>findUserReview(String email){
+        User user = userRepository.findByEmailAndIsDeletedFalse(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        List<Review> reviews = reviewRepository.findAllMyReviews(user.getId());
+
+        return reviews.stream()
+                .map(MyReviewResponseDto::from)
                 .toList();
     }
 }

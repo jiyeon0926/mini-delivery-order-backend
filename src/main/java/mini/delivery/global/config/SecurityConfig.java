@@ -46,7 +46,7 @@ public class SecurityConfig {
                                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                                 .dispatcherTypeMatchers(DispatcherType.FORWARD, DispatcherType.INCLUDE, DispatcherType.ERROR).permitAll()
                                 .requestMatchers("/api/owner/**").hasRole(Role.OWNER.name())
-                                .requestMatchers("/api/cart/**", "/api/orders/**").hasRole(Role.CUSTOMER.name())
+                                .requestMatchers("/api/cart/**", "/api/orders/**", "/api/reviews/**").hasRole(Role.CUSTOMER.name())
                                 .anyRequest().authenticated())
                 .userDetailsService(userDetailsService)
                 .exceptionHandling(handler -> handler

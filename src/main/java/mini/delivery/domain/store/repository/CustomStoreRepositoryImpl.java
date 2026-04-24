@@ -1,6 +1,7 @@
 package mini.delivery.domain.store.repository;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import mini.delivery.domain.menu.entity.QMenu;
@@ -9,6 +10,7 @@ import mini.delivery.domain.review.entity.QReview;
 import mini.delivery.domain.store.dto.QStoreSummaryDto;
 import mini.delivery.domain.store.dto.StoreSummaryDto;
 import mini.delivery.domain.store.entity.QStore;
+import mini.delivery.global.common.enums.StoreStatus;
 
 import java.util.List;
 
@@ -35,6 +37,7 @@ public class CustomStoreRepositoryImpl implements CustomStoreRepository {
         return jpaQueryFactory.select(new QStoreSummaryDto(
                         store.id,
                         store.name,
+                        store.storeStatus,
                         store.minOrderAmount,
                         review.rating.avg(),
                         review.id.countDistinct()
@@ -45,7 +48,14 @@ public class CustomStoreRepositoryImpl implements CustomStoreRepository {
                 .leftJoin(menu).on(store.id.eq(menu.store.id))
                 .where(conditions)
                 .groupBy(store.id)
-                .orderBy(review.rating.avg().desc(), review.id.countDistinct().desc(), store.createdAt.desc())
+                .orderBy(new CaseBuilder() // CASE WHEN THEN
+                                .when(store.storeStatus.eq(StoreStatus.OPEN))
+                                .then(1)
+                                .otherwise(0)
+                                .desc(),
+                        review.rating.avg().desc(),
+                        review.id.countDistinct().desc(),
+                        store.createdAt.desc())
                 .fetch();
     }
 }

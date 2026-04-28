@@ -15,5 +15,6 @@ public class ReviewCreateRequestDto {
     @Max(5)
     private  final int rating;
 
+    @NotNull
     private final String content;
 }

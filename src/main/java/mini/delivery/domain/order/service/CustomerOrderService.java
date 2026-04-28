@@ -11,6 +11,7 @@ import mini.delivery.domain.order.entity.Order;
 import mini.delivery.domain.order.entity.OrderItem;
 import mini.delivery.domain.order.repository.OrderItemRepository;
 import mini.delivery.domain.order.repository.OrderRepository;
+import mini.delivery.domain.review.repository.ReviewRepository;
 import mini.delivery.domain.store.entity.Store;
 import mini.delivery.domain.user.entity.User;
 import mini.delivery.domain.user.repository.UserRepository;
@@ -30,6 +31,7 @@ public class CustomerOrderService {
     private final UserRepository userRepository;
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
+    private final ReviewRepository reviewRepository;
 
     @Transactional
     public OrderCreateResponseDto createOrder(String address, String email) {
@@ -84,8 +86,9 @@ public class CustomerOrderService {
         return orders.stream()
                 .map(order -> {
                     List<OrderItem> orderItems = orderItemRepository.findAllByOrderIdWithMenu(order.getId());
+                    boolean hasReview = reviewRepository.existsByOrderId(order.getId());
 
-                    return CustomerOrderResponseDto.from(order, CustomerOrderItemResponseDto.from(orderItems));
+                    return CustomerOrderResponseDto.from(order, hasReview, CustomerOrderItemResponseDto.from(orderItems));
                 })
                 .toList();
     }

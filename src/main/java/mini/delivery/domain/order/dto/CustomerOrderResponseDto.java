@@ -15,19 +15,21 @@ public class CustomerOrderResponseDto {
     private final LocalDateTime createdAt;
     private final String orderStatus;
     private final int totalAmount;
+    private final boolean hasReview;
     private final List<CustomerOrderItemResponseDto> items;
 
-    private CustomerOrderResponseDto(Long orderId, Long storeId, String storeName, LocalDateTime createdAt, String orderStatus, int totalAmount, List<CustomerOrderItemResponseDto> items) {
+    private CustomerOrderResponseDto(Long orderId, Long storeId, String storeName, LocalDateTime createdAt, String orderStatus, int totalAmount, boolean hasReview, List<CustomerOrderItemResponseDto> items) {
         this.orderId = orderId;
         this.storeId = storeId;
         this.storeName = storeName;
         this.createdAt = createdAt;
         this.orderStatus = orderStatus;
         this.totalAmount = totalAmount;
+        this.hasReview = hasReview;
         this.items = items;
     }
 
-    public static CustomerOrderResponseDto from(Order order, List<CustomerOrderItemResponseDto> items) {
+    public static CustomerOrderResponseDto from(Order order, boolean hasReview, List<CustomerOrderItemResponseDto> items) {
         return new CustomerOrderResponseDto(
                 order.getId(),
                 order.getStore().getId(),
@@ -35,6 +37,7 @@ public class CustomerOrderResponseDto {
                 order.getCreatedAt(),
                 order.getOrderStatus().name(),
                 order.getTotalAmount(),
+                hasReview,
                 items
         );
     }

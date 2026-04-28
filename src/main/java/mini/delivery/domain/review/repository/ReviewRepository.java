@@ -11,6 +11,8 @@ import java.util.List;
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
+    boolean existsByOrderId(Long orderId);
+
     @Query("SELECT COALESCE(AVG(r.rating), 0) FROM Review r WHERE r.isDeleted = false AND r.order.store.id = :storeId")
     double averageRatingByStoreId(@Param("storeId") Long storeId);
 

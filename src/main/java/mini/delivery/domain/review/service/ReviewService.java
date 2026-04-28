@@ -30,44 +30,44 @@ public class ReviewService {
     private final StoreRepository storeRepository;
 
     @Transactional
-    public ReviewCreateResponseDto createReview(Long orderId, ReviewCreateRequestDto reviewCreateRequestDto, String email){
+    public ReviewCreateResponseDto createReview(Long orderId, ReviewCreateRequestDto reviewCreateRequestDto, String email) {
         User user = userRepository.findByEmailAndIsDeletedFalse(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        Order order = orderRepository.findById(orderId)
+        Order order = orderRepository.findByIdAndUserId(orderId, user.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
-        if (!order.getUser().getId().equals(user.getId())) {
-                throw new CustomException(ErrorCode.ORDER_NOT_FOUND); 
+        if (order.getOrderStatus() != OrderStatus.DELIVERED) {
+            throw new CustomException(ErrorCode.ORDER_NOT_DELIVERED);
         }
-        if (order.getOrderStatus() != OrderStatus.DELIVERED){
-                throw new CustomException(ErrorCode.ORDER_NOT_DELIVERED);
+        if (reviewRepository.existsByOrderId(orderId)) {
+            throw new CustomException(ErrorCode.REVIEW_ALREADY_EXISTS);
         }
-        
-    Review review = Review.create(
-        user,
-        order,
-        reviewCreateRequestDto.getRating(),
-        reviewCreateRequestDto.getContent()
-    ); 
-    Review savedReview = reviewRepository.save(review); 
-    return ReviewCreateResponseDto.from(savedReview);
+
+        Review review = Review.create(
+                user,
+                order,
+                reviewCreateRequestDto.getRating(),
+                reviewCreateRequestDto.getContent()
+        );
+        Review savedReview = reviewRepository.save(review);
+        return ReviewCreateResponseDto.from(savedReview);
     }
 
     @Transactional
-    public void deleteReview(Long storeId, Long reviewId, String email){
+    public void deleteReview(Long storeId, Long reviewId, String email) {
         User user = userRepository.findByEmailAndIsDeletedFalse(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-        storeRepository.findByIdAndUserId(storeId,user.getId())
+        storeRepository.findByIdAndUserId(storeId, user.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new CustomException(ErrorCode.REVIEW_NOT_FOUND));
-        if(!review.getOrder().getStore().getId().equals(storeId)){
+        if (!review.getOrder().getStore().getId().equals(storeId)) {
             throw new CustomException(ErrorCode.REVIEW_NOT_FOUND);
         }
         review.deleteReview();
     }
 
     @Transactional(readOnly = true)
-    public List<ReviewOwnerUserResponseDto> allFindReview(Long storeId){
+    public List<ReviewOwnerUserResponseDto> allFindReview(Long storeId) {
         List<Review> reviews = reviewRepository.findAllByStoreId(storeId);
 
         return reviews.stream()
@@ -76,7 +76,7 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public List<MyReviewResponseDto>findUserReview(String email){
+    public List<MyReviewResponseDto> findUserReview(String email) {
         User user = userRepository.findByEmailAndIsDeletedFalse(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 

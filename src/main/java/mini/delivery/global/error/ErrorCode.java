@@ -29,7 +29,8 @@ public enum ErrorCode {
     // 409 CONFLICT
     EMAIL_ALREADY_EXISTS(CONFLICT, "이미 사용 중인 이메일입니다."),
     STORE_LIMIT_EXCEEDED(CONFLICT, "가게는 최대 3개까지 운영할 수 있습니다."),
-    CART_ITEM_ALREADY_EXISTS(CONFLICT, "이미 장바구니에 담긴 메뉴입니다.");
+    CART_ITEM_ALREADY_EXISTS(CONFLICT, "이미 장바구니에 담긴 메뉴입니다."),
+    REVIEW_ALREADY_EXISTS(CONFLICT, "이미 해당 주문에 대한 리뷰가 존재합니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

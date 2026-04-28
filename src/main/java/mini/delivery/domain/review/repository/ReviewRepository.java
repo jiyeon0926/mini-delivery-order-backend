@@ -19,7 +19,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     @Query("SELECT COALESCE(COUNT(r.id), 0) FROM Review r WHERE r.isDeleted = false AND r.order.store.id = :storeId")
     long countByStoreId(@Param("storeId") Long storeId);
 
-    @Query("SELECT r FROM Review r join fetch r.user u where r.isDeleted = false and r.order.store.id = :storeId order by r.createdAt desc")
+    @Query("SELECT r FROM Review r join fetch r.user u where r.order.store.id = :storeId order by r.createdAt desc")
     List<Review> findAllByStoreId(@Param("storeId") Long storeId);
 
     @Query("SELECT r FROM Review r join fetch r.user u join fetch r.order o join fetch o.store s where r.isDeleted = false and u.id = :userId order by r.createdAt desc")

@@ -91,11 +91,25 @@ public class OwnerOrderService {
         User user = userRepository.findByEmailAndIsDeletedFalse(email)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        ZoneId zone = ZoneId.of("Asia/Seoul");
-        LocalDateTime start = (date != null) ? date.atStartOfDay() : LocalDate.now(zone).atStartOfDay();
+        LocalDateTime start = getStartOfDayInSeoul(date);
         LocalDateTime end = start.plusDays(1);
 
-        Map<OrderStatus, Long> map = getOrderStatusCountMap(user.getId(), start, end);
+        List<OrderStatusAndCountOnly> results = orderRepository.getCountGroupByStatusAndDate(user.getId(), start, end);
+        Map<OrderStatus, Long> map = getOrderStatusCountMap(results);
+
+        return DailyOrderCountResponseDto.from(start.toLocalDate(), OrderStatusCountResponseDto.from(map));
+    }
+
+    @Transactional(readOnly = true)
+    public DailyOrderCountResponseDto getOrderCountByStatusAndStoreId(Long storeId, LocalDate date, String email) {
+        User user = userRepository.findByEmailAndIsDeletedFalse(email)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        LocalDateTime start = getStartOfDayInSeoul(date);
+        LocalDateTime end = start.plusDays(1);
+
+        List<OrderStatusAndCountOnly> results = orderRepository.getCountGroupByStatusAndDate(storeId, user.getId(), start, end);
+        Map<OrderStatus, Long> map = getOrderStatusCountMap(results);
 
         return DailyOrderCountResponseDto.from(start.toLocalDate(), OrderStatusCountResponseDto.from(map));
     }
@@ -124,8 +138,13 @@ public class OwnerOrderService {
                 .toList();
     }
 
-    private Map<OrderStatus, Long> getOrderStatusCountMap(Long userId, LocalDateTime start, LocalDateTime end) {
-        List<OrderStatusAndCountOnly> results = orderRepository.getCountGroupByStatusByOwnerIdAndDate(userId, start, end);
+    private LocalDateTime getStartOfDayInSeoul(LocalDate date) {
+        ZoneId zone = ZoneId.of("Asia/Seoul");
+
+        return (date != null) ? date.atStartOfDay() : LocalDate.now(zone).atStartOfDay();
+    }
+
+    private Map<OrderStatus, Long> getOrderStatusCountMap(List<OrderStatusAndCountOnly> results) {
         Map<OrderStatus, Long> map = new EnumMap<>(OrderStatus.class);
         results.forEach(result -> map.put(result.getOrderStatus(), result.getCount()));
 

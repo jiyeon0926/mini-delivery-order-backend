@@ -86,6 +86,17 @@ public class OwnerOrderController {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(CommonResponseBody.success("주문 수 조회를 성공하였습니다.", dailyOrderCountResponseDto));
+                .body(CommonResponseBody.success("전체 주문 수 조회를 성공하였습니다.", dailyOrderCountResponseDto));
+    }
+
+    @GetMapping("/stores/{storeId}/orders/count")
+    public ResponseEntity<CommonResponseBody<DailyOrderCountResponseDto>> getOrderCountByStatusAndStoreId(@PathVariable Long storeId,
+                                                                                                          @RequestParam(value = "date", required = false) LocalDate date,
+                                                                                                          @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        DailyOrderCountResponseDto dailyOrderCountResponseDto = ownerOrderService.getOrderCountByStatusAndStoreId(storeId, date, userDetails.getUsername());
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommonResponseBody.success("가게 주문 수 조회를 성공하였습니다.", dailyOrderCountResponseDto));
     }
 }

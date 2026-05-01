@@ -36,7 +36,18 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
                     "WHERE s.user.id = :userId AND o.createdAt >= :start AND o.createdAt < :end " +
                     "GROUP BY o.orderStatus"
     )
-    List<OrderStatusAndCountOnly> getCountGroupByStatusByOwnerIdAndDate(@Param("userId") Long userId,
-                                                                        @Param("start") LocalDateTime start,
-                                                                        @Param("end") LocalDateTime end);
+    List<OrderStatusAndCountOnly> getCountGroupByStatusAndDate(@Param("userId") Long userId,
+                                                               @Param("start") LocalDateTime start,
+                                                               @Param("end") LocalDateTime end);
+
+    @Query(
+            "SELECT o.orderStatus AS orderStatus, COUNT(o.id) AS count FROM Order o " +
+                    "INNER JOIN o.store s " +
+                    "WHERE s.id = :storeId AND s.user.id = :userId AND o.createdAt >= :start AND o.createdAt < :end " +
+                    "GROUP BY o.orderStatus"
+    )
+    List<OrderStatusAndCountOnly> getCountGroupByStatusAndDate(@Param("storeId") Long storeId,
+                                                               @Param("userId") Long userId,
+                                                               @Param("start") LocalDateTime start,
+                                                               @Param("end") LocalDateTime end);
 }

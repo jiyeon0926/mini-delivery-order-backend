@@ -108,6 +108,10 @@ public class StoreService {
         Store store = storeRepository.findByIdAndUserIdAndIsDeletedFalse(storeId, user.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
 
+        if (store.isOpenStatus()) {
+            throw new CustomException(ErrorCode.STORE_MUST_BE_CLOSED_FIRST);
+        }
+
         store.deleteStore();
     }
 

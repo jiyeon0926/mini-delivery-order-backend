@@ -3,10 +3,7 @@ package mini.delivery.domain.review.service;
 import lombok.RequiredArgsConstructor;
 import mini.delivery.domain.order.entity.Order;
 import mini.delivery.domain.order.repository.OrderRepository;
-import mini.delivery.domain.review.dto.MyReviewResponseDto;
-import mini.delivery.domain.review.dto.ReviewCreateRequestDto;
-import mini.delivery.domain.review.dto.ReviewCreateResponseDto;
-import mini.delivery.domain.review.dto.ReviewOwnerUserResponseDto;
+import mini.delivery.domain.review.dto.*;
 import mini.delivery.domain.review.entity.Review;
 import mini.delivery.domain.review.repository.ReviewRepository;
 import mini.delivery.domain.store.repository.StoreRepository;
@@ -67,12 +64,11 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReviewOwnerUserResponseDto> allFindReview(Long storeId) {
+    public StoreReviewResponseDto allFindReview(Long storeId) {
         List<Review> reviews = reviewRepository.findAllByStoreId(storeId);
+        long total = reviewRepository.countByStoreId(storeId);
 
-        return reviews.stream()
-                .map(ReviewOwnerUserResponseDto::from)
-                .toList();
+        return StoreReviewResponseDto.from(total, ReviewListResponseDto.from(reviews));
     }
 
     @Transactional(readOnly = true)

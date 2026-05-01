@@ -4,11 +4,12 @@ import lombok.Getter;
 import mini.delivery.domain.review.entity.Review;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
-public class ReviewOwnerUserResponseDto {
+public class ReviewListResponseDto {
 
-    private final Long reviewid;
+    private final Long reviewId;
     private final Long userId;
     private final String nickname;
     private final int rating;
@@ -16,8 +17,8 @@ public class ReviewOwnerUserResponseDto {
     private final LocalDateTime createdAt;
     private final boolean deleted;
 
-    private ReviewOwnerUserResponseDto(Long reviewid, Long userId ,String nickname, int rating, String content, LocalDateTime createdAt, boolean deleted) {
-        this.reviewid = reviewid;
+    private ReviewListResponseDto(Long reviewId, Long userId, String nickname, int rating, String content, LocalDateTime createdAt, boolean deleted) {
+        this.reviewId = reviewId;
         this.userId = userId;
         this.nickname = nickname;
         this.content = content;
@@ -26,8 +27,8 @@ public class ReviewOwnerUserResponseDto {
         this.deleted = deleted;
     }
 
-    public static ReviewOwnerUserResponseDto from(Review review){
-        return new ReviewOwnerUserResponseDto(
+    public static ReviewListResponseDto from(Review review) {
+        return new ReviewListResponseDto(
                 review.getId(),
                 review.getUser().getId(),
                 review.getUser().getNickname(),
@@ -38,4 +39,9 @@ public class ReviewOwnerUserResponseDto {
         );
     }
 
+    public static List<ReviewListResponseDto> from(List<Review> reviews) {
+        return reviews.stream()
+                .map(ReviewListResponseDto::from)
+                .toList();
+    }
 }

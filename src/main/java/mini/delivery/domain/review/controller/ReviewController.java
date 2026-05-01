@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import mini.delivery.domain.review.dto.MyReviewResponseDto;
 import mini.delivery.domain.review.dto.ReviewCreateRequestDto;
 import mini.delivery.domain.review.dto.ReviewCreateResponseDto;
-import mini.delivery.domain.review.dto.ReviewOwnerUserResponseDto;
+import mini.delivery.domain.review.dto.StoreReviewResponseDto;
 import mini.delivery.domain.review.service.ReviewService;
 import mini.delivery.global.auth.UserDetailsImpl;
 import mini.delivery.global.common.dto.CommonResponseBody;
@@ -55,12 +55,10 @@ public class ReviewController {
     }
     // 리뷰 조회 (비로그인 가능)
     @GetMapping("/stores/{storeId}/reviews")
-    public ResponseEntity<CommonResponseBody<List<ReviewOwnerUserResponseDto>>> allFindReview(@PathVariable Long storeId){
-        List<ReviewOwnerUserResponseDto> reivewOwnerUserResponseDtoList = reviewService.allFindReview(
-                storeId
-        );
+    public ResponseEntity<CommonResponseBody<StoreReviewResponseDto>> allFindReview(@PathVariable Long storeId){
+        StoreReviewResponseDto storeReviewResponseDto = reviewService.allFindReview(storeId);
 
-        return ResponseEntity.status(HttpStatus.OK).body(CommonResponseBody.success("리뷰 목록 조회를 성공하였습니다.",reivewOwnerUserResponseDtoList));
+        return ResponseEntity.status(HttpStatus.OK).body(CommonResponseBody.success("리뷰 목록 조회를 성공하였습니다.",storeReviewResponseDto));
     }
 
     // 내 리뷰만 조회 

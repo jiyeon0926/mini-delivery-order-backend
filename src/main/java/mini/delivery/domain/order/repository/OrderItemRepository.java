@@ -13,4 +13,7 @@ public interface OrderItemRepository extends JpaRepository<OrderItem, Long> {
 
     @Query("SELECT i FROM OrderItem i INNER JOIN FETCH i.menu m WHERE i.order.id = :orderId")
     List<OrderItem> findAllByOrderIdWithMenu(@Param("orderId") Long orderId);
+
+    @Query("SELECT i From OrderItem i INNER JOIN FETCH i.menu m WHERE i.order.id IN :orderIds")
+    List<OrderItem> findAllByOrderIdsWithMenu(@Param("orderIds") List<Long> orderIds);
 }

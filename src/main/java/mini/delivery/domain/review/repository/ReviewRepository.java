@@ -23,5 +23,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findAllByStoreId(@Param("storeId") Long storeId);
 
     @Query("SELECT r FROM Review r join fetch r.user u join fetch r.order o join fetch o.store s where r.isDeleted = false and u.id = :userId order by r.createdAt desc")
-    List<Review> findAllMyReviews(@Param("userId")Long userId);
+    List<Review> findAllMyReviews(@Param("userId") Long userId);
+
+    @Query("SELECT r.order.id FROM Review r WHERE r.order.id IN :orderIds")
+    List<Long> findOrderIdsByOrderIds(@Param("orderIds") List<Long> orderIds);
 }

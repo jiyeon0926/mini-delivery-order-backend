@@ -21,6 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -83,10 +85,17 @@ public class CustomerOrderService {
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         List<Order> orders = orderRepository.findAllByUserIdWithStore(user.getId());
 
+        // orderId 목록 추출 → IN 연산자를 통해 한 번에 조회 → orderId 기준으로 그룹핑
+        List<Long> orderIds = extractOrderIds(orders);
+        Map<Long, List<OrderItem>> orderItemsMap = getOrderItemsMap(orderIds);
+
+        // IN 연산자를 통해 한 번에 조회
+        List<Long> reviewedOrderIds = reviewRepository.findOrderIdsByOrderIds(orderIds);
+
         return orders.stream()
                 .map(order -> {
-                    List<OrderItem> orderItems = orderItemRepository.findAllByOrderIdWithMenu(order.getId());
-                    boolean hasReview = reviewRepository.existsByOrderId(order.getId());
+                    List<OrderItem> orderItems = orderItemsMap.getOrDefault(order.getId(), List.of());
+                    boolean hasReview = reviewedOrderIds.contains(order.getId());
 
                     return CustomerOrderResponseDto.from(order, hasReview, CustomerOrderItemResponseDto.from(orderItems));
                 })
@@ -137,6 +146,18 @@ public class CustomerOrderService {
         if (order.isNotPendingStatus()) {
             throw new CustomException(ErrorCode.ORDER_NOT_IN_PENDING_STATUS);
         }
+    }
+
+    private List<Long> extractOrderIds(List<Order> orders) {
+        return orders.stream()
+                .map(Order::getId)
+                .toList();
+    }
+
+    private Map<Long, List<OrderItem>> getOrderItemsMap(List<Long> orderIds) {
+        return orderItemRepository.findAllByOrderIdsWithMenu(orderIds)
+                .stream()
+                .collect(Collectors.groupingBy(item -> item.getOrder().getId()));
     }
 
     private List<OrderItemDetailResponseDto> toOrderItemDetailResponses(List<OrderItem> items) {

@@ -31,8 +31,8 @@ public class CartService {
     /**
      * 1. 장바구니를 조회하고 없으면 생성 (orElseGet)
      * 2. 다른 가게 메뉴를 담을 경우, 장바구니에 담긴 기존 메뉴 삭제 (가게 비교)
-     * 3. 동일한 메뉴 추가 불가
-     * 4. CartItem 저장
+     * 3. 동일한 메뉴 추가 시 수량 Update
+     * 4. 새 메뉴 추가 시 Insert
      */
     @Transactional
     public void addCartItem(Long menuId, int quantity, String email) {
@@ -47,10 +47,12 @@ public class CartService {
                 .orElseGet(() -> cartRepository.save(Cart.create(user, menu.getStore())));
 
         clearCartIfDifferentStore(cart, menu.getStore());
-        validateDuplicateMenu(cart, menuId);
 
-        CartItem cartItem = CartItem.create(cart, menu, quantity);
-        cartItemRepository.save(cartItem);
+        cartItemRepository.findByCartAndMenuId(cart, menuId)
+                .ifPresentOrElse(
+                        item -> item.increaseQuantity(quantity),
+                        () -> cartItemRepository.save(CartItem.create(cart, menu, quantity))
+                );
     }
 
     @Transactional
@@ -97,13 +99,6 @@ public class CartService {
             cartItemRepository.deleteAllByCart(cart);
             cart.updateCart(newStore);
         }
-    }
-
-    private void validateDuplicateMenu(Cart cart, Long menuId) {
-        cartItemRepository.findByCartAndMenuId(cart, menuId)
-                .ifPresent(item -> {
-                    throw new CustomException(ErrorCode.CART_ITEM_ALREADY_EXISTS);
-                });
     }
 
     private CartResponseDto buildCartResponse(Long userId) {

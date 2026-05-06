@@ -77,7 +77,7 @@ public class StoreService {
         double averageRating = reviewRepository.averageRatingByStoreId(storeId);
         long reviewCount = reviewRepository.countByStoreId(storeId);
 
-        List<Menu> menus = menuRepository.findAllByStoreId(storeId);
+        List<Menu> menus = menuRepository.findAllByStoreIdAndIsDeletedFalse(storeId);
 
         return StoreResponseDto.from(store, averageRating, reviewCount, StoreMenuResponseDto.from(menus));
     }

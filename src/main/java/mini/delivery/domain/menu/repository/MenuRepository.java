@@ -12,11 +12,11 @@ import java.util.Optional;
 @Repository
 public interface MenuRepository extends JpaRepository<Menu, Long> {
 
-    List<Menu> findAllByStoreId(Long storeId);
+    List<Menu> findAllByStoreIdAndIsDeletedFalse(Long storeId);
 
-    @Query("SELECT m FROM Menu m INNER JOIN FETCH m.store WHERE m.id = :id")
+    @Query("SELECT m FROM Menu m INNER JOIN FETCH m.store WHERE m.id = :id AND m.isDeleted = false")
     Optional<Menu> findByIdWithStore(@Param("id") Long menuId);
 
-    @Query("SELECT m FROM Menu m INNER JOIN m.store s WHERE m.id = :id AND s.id = :storeId AND s.user.id = :userId")
+    @Query("SELECT m FROM Menu m INNER JOIN m.store s WHERE m.id = :id AND s.id = :storeId AND s.user.id = :userId AND m.isDeleted = false")
     Optional<Menu> findByIdAndStoreIdAndUserId(@Param("id") Long menuId, @Param("storeId") Long storeId, @Param("userId") Long userId);
 }

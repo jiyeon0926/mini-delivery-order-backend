@@ -14,14 +14,14 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/owner/stores/{storeId}/menus")
 @RequiredArgsConstructor
 public class MenuController {
 
     private final MenuService menuService;
 
     // 메뉴 생성
-    @PostMapping("/owner/stores/{storeId}/menu")
+    @PostMapping
     public ResponseEntity<CommonResponseBody<MenuCreateResponseDto>> createMenu(@PathVariable Long storeId,
                                                                                 @Valid @RequestBody MenuCreateRequestDto menuCreateRequestDto,
                                                                                 @AuthenticationPrincipal UserDetailsImpl userDetails) {
@@ -37,7 +37,7 @@ public class MenuController {
     }
 
     // 메뉴 수정
-    @PatchMapping("/owner/stores/{storeId}/menu/{menuId}")
+    @PatchMapping("/{menuId}")
     public ResponseEntity<CommonResponseBody<Void>> updateMenu(@PathVariable Long storeId,
                                                                @PathVariable Long menuId,
                                                                @Valid @RequestBody MenuUpdateRequestDto menuUpdateRequestDto,
@@ -55,7 +55,7 @@ public class MenuController {
     }
 
     // 메뉴 삭제
-    @DeleteMapping("/owner/stores/{storeId}/menu/{menuId}")
+    @DeleteMapping("/{menuId}")
     public ResponseEntity<Void> deleteMenu(@PathVariable Long storeId,
                                                @PathVariable Long menuId,
                                                @AuthenticationPrincipal UserDetailsImpl userDetails){

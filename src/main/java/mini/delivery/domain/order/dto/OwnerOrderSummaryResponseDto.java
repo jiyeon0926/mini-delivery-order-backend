@@ -13,13 +13,15 @@ public class OwnerOrderSummaryResponseDto {
     private final String orderNumber;
     private final int totalAmount;
     private final String orderStatus;
+    private final String rejectionReason;
     private final LocalDateTime createdAt;
 
-    private OwnerOrderSummaryResponseDto(Long orderId, String orderNumber, int totalAmount, String orderStatus, LocalDateTime createdAt) {
+    private OwnerOrderSummaryResponseDto(Long orderId, String orderNumber, int totalAmount, String orderStatus, String rejectionReason, LocalDateTime createdAt) {
         this.orderId = orderId;
         this.orderNumber = orderNumber;
         this.totalAmount = totalAmount;
         this.orderStatus = orderStatus;
+        this.rejectionReason = rejectionReason;
         this.createdAt = createdAt;
     }
 
@@ -29,6 +31,7 @@ public class OwnerOrderSummaryResponseDto {
                 order.getOrderNumber(),
                 order.getTotalAmount(),
                 order.getOrderStatus().name(),
+                order.getRejectionReason(),
                 order.getCreatedAt()
         );
     }

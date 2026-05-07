@@ -68,7 +68,7 @@ public class OwnerOrderService {
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         Store store = storeRepository.findByIdAndUserId(storeId, user.getId())
                 .orElseThrow(() -> new CustomException(ErrorCode.STORE_NOT_FOUND));
-        List<Order> orders = orderRepository.findAllByStoreId(storeId);
+        List<Order> orders = orderRepository.findAllByStoreIdOrderByCreatedAtDesc(storeId);
 
         return OwnerStoreOrderResponseDto.from(store, OwnerOrderSummaryResponseDto.from(orders));
     }

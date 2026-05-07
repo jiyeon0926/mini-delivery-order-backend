@@ -28,7 +28,7 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT o FROM Order o INNER JOIN FETCH o.store s WHERE o.id = :id AND o.user.id = :userId")
     Optional<Order> findByIdAndUserIdWithStore(@Param("id") Long orderId, @Param("userId") Long userId);
 
-    List<Order> findAllByStoreId(Long storeId);
+    List<Order> findAllByStoreIdOrderByCreatedAtDesc(Long storeId);
 
     @Query(
             "SELECT o.orderStatus AS orderStatus, COUNT(o.id) AS count FROM Order o " +

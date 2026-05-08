@@ -5,7 +5,7 @@ EAT NOW 서버는 배달 주문 서비스를 위한 Backend 시스템으로, RES
 ![Project](https://img.shields.io/badge/Project-EAT%20NOW(Backend)-orange)
 ![Service](https://img.shields.io/badge/Service-배달%20주문%20REST%20API-blue)
 ![Team](https://img.shields.io/badge/Team-2인%20프로젝트-purple)
-![Period](https://img.shields.io/badge/Period-2026.04.06~진행%20중-green)
+![Period](https://img.shields.io/badge/Period-2026.04.06~2026.05.08-green)
 
 # 📍 목차
 [![주요 기능](https://img.shields.io/badge/주요%20기능-FF6B6B?style=for-the-badge)](#주요-기능)

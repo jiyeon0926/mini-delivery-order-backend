@@ -1,0 +1,66 @@
+package mini.delivery.domain.user.controller;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import mini.delivery.domain.user.dto.NicknameRequestDto;
+import mini.delivery.domain.user.dto.NicknameResponseDto;
+import mini.delivery.domain.user.dto.PasswordRequestDto;
+import mini.delivery.domain.user.dto.UserResponseDto;
+import mini.delivery.domain.user.service.UserService;
+import mini.delivery.global.auth.UserDetailsImpl;
+import mini.delivery.global.common.dto.CommonResponseBody;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/users/me")
+@RequiredArgsConstructor
+public class UserController {
+
+    private final UserService userService;
+
+    @PatchMapping("/nickname")
+    public ResponseEntity<CommonResponseBody<NicknameResponseDto>> updateNickname(@Valid @RequestBody NicknameRequestDto nicknameRequestDto,
+                                                                                  @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        NicknameResponseDto nicknameResponseDto = userService.updateNickname(
+                nicknameRequestDto.getNickname(),
+                userDetails.getUsername()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommonResponseBody.success("닉네임을 변경하였습니다.", nicknameResponseDto));
+    }
+
+    @PatchMapping("/password")
+    public ResponseEntity<CommonResponseBody<Void>> updatePassword(@Valid @RequestBody PasswordRequestDto passwordRequestDto,
+                                                                   @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        userService.updatePassword(
+                passwordRequestDto.getOldPassword(),
+                passwordRequestDto.getNewPassword(),
+                userDetails.getUsername()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommonResponseBody.success("비밀번호를 변경하였습니다."));
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> deleteUser(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        userService.deleteUser(userDetails.getUsername());
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<CommonResponseBody<UserResponseDto>> getMyProfile(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        UserResponseDto userResponseDto = userService.getMyProfile(userDetails.getUsername());
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(CommonResponseBody.success("프로필 조회를 성공하였습니다.", userResponseDto));
+    }
+}

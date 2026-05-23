@@ -30,8 +30,10 @@ public class CustomStoreRepositoryImpl implements CustomStoreRepository {
         conditions.and(store.isDeleted.eq(false));
 
         if (keyword != null) {
-            conditions.and(store.name.contains(keyword))
-                    .or(menu.name.contains(keyword));
+            conditions.and(
+                    store.name.contains(keyword)
+                            .or(menu.name.contains(keyword))
+            );
         }
 
         return jpaQueryFactory.select(new QStoreSummaryDto(
